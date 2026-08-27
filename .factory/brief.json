@@ -1,0 +1,12 @@
+{
+  "slug": "folder-recipe-switcher",
+  "title": "Folder Recipe",
+  "artifact_class": "cli",
+  "smallest_useful_product": "A local utility that writes a versioned .photo-recipe.json beside a folder, records camera/source heuristics and recommended editor profile/style, previews inherited rules, and exports an import checklist.",
+  "constraints": [
+    "Never modify originals",
+    "Keep manifests plain-text and source-control friendly",
+    "Map profile names explicitly for each editor"
+  ],
+  "monetization": "free"
+}
