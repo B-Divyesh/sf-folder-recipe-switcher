@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#090e13" />
+    <meta name="description" content="Portable, inspectable processing recipes for photo folders. A free local-first CLI." />
+    <link rel="icon" href="/folder-mark.svg" type="image/svg+xml" />
+    <link rel="preload" href="/archive-room.webp" as="image" type="image/webp" />
+    <title>Folder Recipe — Keep every photo folder’s intent</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Folder Recipe home">
+        <img src="/folder-mark.svg" width="34" height="28" alt="" />
+        <span>Folder Recipe</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="#workflow">Workflow</a>
+        <a href="#inspect">Try a manifest</a>
+        <a href="https://github.com/B-Divyesh/sf-folder-recipe-switcher">Source</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <img class="hero-art" src="/archive-room.webp" width="1536" height="1024" alt="A blue-hour photographic archive room leading toward a single amber folder marker" fetchpriority="high" />
+        <div class="hero-shade"></div>
+        <div class="hero-copy">
+          <p class="eyebrow"><span aria-hidden="true">01</span> Local archive protocol</p>
+          <h1 id="hero-title">The right recipe,<br />waiting in the folder.</h1>
+          <p class="lede">Stop carrying processing intent in your head. Put the editor profile and the reason beside the photographs—plain text, portable, inspectable.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#install">Install the CLI</a>
+            <a class="button quiet" href="#inspect">Inspect a manifest</a>
+          </div>
+          <p class="safety"><span aria-hidden="true">●</span> Reads folder metadata. Never alters originals.</p>
+        </div>
+        <aside class="manifest-peek" aria-label="Example selected recipe">
+          <div class="peek-head"><span>selects/.photo-recipe.json</span><span class="status">direct</span></div>
+          <div class="peek-line"><span>recommended</span><strong>rawtherapee</strong></div>
+          <div class="peek-line"><span>profile</span><strong>Portrait neutral v3</strong></div>
+          <div class="peek-line"><span>why</span><strong>Protect warm skin tones</strong></div>
+        </aside>
+      </section>
+
+      <section class="promise" aria-label="Product principles">
+        <p>One small manifest</p><p>Any editor explicitly mapped</p><p>Zero pixels changed</p>
+      </section>
+
+      <section class="section workflow" id="workflow" aria-labelledby="workflow-title">
+        <div class="section-intro">
+          <p class="eyebrow"><span aria-hidden="true">02</span> Archive rhythm</p>
+          <h2 id="workflow-title">Decide once. Verify in context.</h2>
+          <p>Each folder can set its own rule or inherit the nearest parent. You can see which one applies before opening an editor.</p>
+        </div>
+        <ol class="recipe-rail">
+          <li><span class="step">01</span><div><h3>Record</h3><p>Map editor names to exact profiles and note why this shoot differs.</p><code>folder-recipe init ./shoot …</code></div></li>
+          <li><span class="step">02</span><div><h3>Inspect</h3><p>See direct versus inherited intent alongside extensions, count and size.</p><code>folder-recipe inspect ./shoot/selects</code></div></li>
+          <li><span class="step">03</span><div><h3>Carry</h3><p>Export a checked list for a mixed archive before the first import.</p><code>folder-recipe checklist ./archive</code></div></li>
+        </ol>
+      </section>
+
+      <section class="section inspector" id="inspect" aria-labelledby="inspect-title">
+        <div class="section-intro">
+          <p class="eyebrow"><span aria-hidden="true">03</span> Browser light table</p>
+          <h2 id="inspect-title">Read the intent. Nothing uploads.</h2>
+          <p>Choose or drop a `.photo-recipe.json`. Parsing happens in this tab and the file is never stored.</p>
+        </div>
+        <div class="light-table">
+          <div class="drop-zone" id="drop-zone">
+            <div class="folder-glyph" aria-hidden="true"><span></span></div>
+            <h3>Place a manifest on the table</h3>
+            <p>JSON only · processed locally</p>
+            <label class="button primary" for="manifest-file">Choose manifest</label>
+            <input id="manifest-file" type="file" accept="application/json,.json" />
+            <button class="text-button" id="load-sample" type="button">Or load the portrait sample</button>
+          </div>
+          <div class="recipe-output" id="recipe-output" aria-live="polite">
+            <p class="output-kicker">Waiting for a manifest</p>
+            <h3>No recipe on the light table</h3>
+            <p>Select the sample to see mappings, heuristics and the folder note in one view.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section install" id="install" aria-labelledby="install-title">
+        <div class="section-intro">
+          <p class="eyebrow"><span aria-hidden="true">04</span> Start local</p>
+          <h2 id="install-title">A small tool, not another catalogue.</h2>
+        </div>
+        <div class="terminal">
+          <div class="terminal-title"><span>terminal</span><span>folder-recipe 0.1.0</span></div>
+          <pre><code>cargo install --git https://github.com/B-Divyesh/sf-folder-recipe-switcher
+
+folder-recipe init ./portraits \
+  --name "August portraits" \
+  --map rawtherapee="Portrait neutral v3" \
+  --camera "Fujifilm X-T5"</code></pre>
+          <button class="copy-button" type="button" data-copy="cargo install --git https://github.com/B-Divyesh/sf-folder-recipe-switcher">Copy install command</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div><img src="/folder-mark.svg" width="28" height="23" alt="" /><span>Folder Recipe · Free and open source</span></div>
+      <nav aria-label="Legal navigation"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-folder-recipe-switcher">GitHub</a></nav>
+    </footer>
+    <div class="offline-note" id="offline-note" role="status" hidden>Offline. The docs and manifest inspector still work locally.</div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
