@@ -29,6 +29,18 @@ test('privacy and terms are static routes', async () => {
   }
 });
 
+test('the 404 route has complete route metadata', async () => {
+  const html = await readFile(new URL('public/404.html', root), 'utf8');
+  assert.match(html, /<title>Page not found — Folder Recipe<\/title>/);
+  assert.match(html, /name="description"/);
+  assert.match(html, /rel="canonical"/);
+  assert.match(html, /property="og:title"/);
+  assert.match(html, /property="og:description"/);
+  assert.match(html, /property="og:url" content="https:\/\/folder-recipe-switcher\.sociobot\.in\/404"/);
+  assert.match(html, /property="og:image"/);
+  assert.match(html, /name="twitter:card"/);
+});
+
 test('reduced motion and focus treatment are explicit', async () => {
   const css = await readFile(new URL('src/style.css', root), 'utf8');
   assert.match(css, /prefers-reduced-motion:\s*reduce/);
