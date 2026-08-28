@@ -68,12 +68,12 @@ Every finding in both review reports, both earlier verification reports, and pol
 
 ## Final evidence
 
-- Clean clone: `/tmp/folder-recipe-polish2.XZ5yAG` at repair commit `3a0e09e`; final terminology-only source changes were rerun locally and are rechecked below from final HEAD.
+- Final clean clone: `/tmp/folder-recipe-polish2-final.ow5mUw` at documentation-complete commit `b6758bf`.
 - Each of the 14 claim commands passed independently; the aggregate suite also passed.
 - `cargo fmt --all -- --check`, strict Clippy, `npm test`, `npm run build`, and `cargo package --manifest-path cli/Cargo.toml` passed.
 - Playwright: 14/14 across desktop Chromium and 390×844 mobile. Axe found zero serious or critical issues.
-- Live Lighthouse: performance 100, accessibility 100, best practices 100, SEO 100; LCP 979 ms, CLS 0, TBT 5 ms.
-- Payload: JS 2,496 B gzip, CSS 3,237 B gzip, no fonts, hero 39,312 B.
+- Live Lighthouse: performance 100, accessibility 100, best practices 100, SEO 100; LCP 895 ms, CLS 0, TBT 0 ms.
+- Payload: JS 2,493 B gzip, CSS 3,237 B gzip, no fonts, hero 39,312 B.
 - Live files for root HTML, hashed JS/CSS, hero, and service worker matched `dist/site` by SHA-256.
 
 No finding of any severity remains unresolved.

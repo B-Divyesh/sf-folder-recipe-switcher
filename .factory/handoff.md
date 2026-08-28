@@ -19,7 +19,7 @@
 
 ## Exact verification
 
-Clean clone `/tmp/folder-recipe-polish2.XZ5yAG` at `3a0e09e`:
+Final clean clone `/tmp/folder-recipe-polish2-final.ow5mUw` at `b6758bf`:
 
 ```sh
 npm ci
@@ -40,8 +40,8 @@ cargo package --manifest-path cli/Cargo.toml
 - Privacy: full demo/selected-file flow contacted only the product origin; local/session storage, cookies, IndexedDB, and OPFS remained empty.
 - Offline: controlled `/demo/` reloaded offline and reset the bundled sample.
 - Package: `cargo package` produced and verified 8 files, 44.8 KiB unpacked and 12.6 KiB compressed.
-- Performance: live Lighthouse scored 100 performance, 100 accessibility, 100 best practices, and 100 SEO; LCP 979 ms, CLS 0, TBT 5 ms.
-- Payload: 2,496 B gzip JS, 3,237 B gzip CSS, no fonts, 39,312 B hero.
+- Performance: live Lighthouse scored 100 performance, 100 accessibility, 100 best practices, and 100 SEO; LCP 895 ms, CLS 0, TBT 0 ms.
+- Payload: 2,493 B gzip JS, 3,237 B gzip CSS, no fonts, 39,312 B hero.
 
 ## Live recheck
 
