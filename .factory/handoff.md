@@ -14,7 +14,7 @@
 - Rewrote the first screen around the photographer’s job and made the isolated sample the primary action.
 - Added `folder-recipe demo`, realistic bundled sample folders, fresh temporary output, a two-folder checklist, and reset instructions.
 - Added equivalent `?demo=1` and `/demo` browser entry points with an in-memory sample, persistent banner, Reset, and Start-for-real controls.
-- Added `.factory/claims.json` and 13 uniquely tagged observable claim tests.
+- Added `.factory/claims.json` and 14 uniquely tagged observable claim tests.
 - Rewrote headings, buttons, errors, README, privacy, terms, and the catalog description in consistent plain words.
 - Added route-specific titles, canonicals, OG/Twitter metadata, social artwork, apple icon, focus announcements, and a designed 404.
 - Added the shared header/footer skeleton to landing, demo, legal, and 404 pages.
@@ -49,10 +49,10 @@ dist/bin/folder-recipe demo
 ## Verification completed
 
 - Fresh clone `/tmp/folder-recipe-clean.ULTSLy` at `71ef63e26e33605bd9067db77b6d66ae59aefc9c`: `npm ci` passed with zero vulnerabilities.
-- All 13 claim commands from `.factory/claims.json` ran separately and passed.
+- All 14 claim commands from `.factory/claims.json` ran separately and passed.
 - Formatting, strict Clippy, the full `npm test`, `npm run build`, and `cargo package` passed in that clone.
 - Rust: 4 library tests and 2 CLI integration tests passed.
-- Site: 5 static contract tests and 13 claim tests passed.
+- Site: 5 static contract tests and 14 claim tests passed.
 - Browser: 12 Playwright project runs passed across desktop and 390×844 mobile.
 - Accessibility: Axe reported zero serious/critical violations at both sizes; keyboard, focus, skip link, landmarks, and reduced motion passed.
 - Privacy: full demo/file flow made only same-origin requests and left cookies, local/session storage, IndexedDB, and OPFS empty.

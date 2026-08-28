@@ -69,7 +69,7 @@ Schema version `1` is deterministic and accepts unknown fields. Other schema ver
 
 ## Develop and verify
 
-Requirements: Rust 1.85 or newer and Node 20 or newer.
+Requirements: Rust and Node.
 
 ```sh
 npm ci

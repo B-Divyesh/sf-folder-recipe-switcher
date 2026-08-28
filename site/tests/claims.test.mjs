@@ -52,7 +52,7 @@ async function temp() { return mkdtemp(join(tmpdir(), 'folder-recipe-claim-')); 
 async function run(args, options = {}) { return execFile(binary, args, { timeout: 8_000, ...options }); }
 async function digest(path) { return createHash('sha256').update(await readFile(path)).digest('hex'); }
 async function init(folder, name, profile = 'Portrait neutral v3') {
-  return run(['init', folder, '--name', name, '--map', `rawtherapee=${profile}`, '--map', 'darktable=Portrait neutral', '--recommend', 'rawtherapee']);
+  return run(['init', folder, '--name', name, '--map', `rawtherapee=${profile}`, '--map', 'darktable=Portrait neutral', '--recommend', 'rawtherapee', '--note', 'Protect warm skin tones']);
 }
 
 test('@claim:demo-isolated creates a disposable complete sample', async () => {
@@ -83,7 +83,8 @@ test('@claim:recipe-write writes readable versioned mappings and folder signals'
     assert.equal(recipe.schema_version, 1);
     assert.deepEqual(recipe.editor_mappings, { darktable: 'Portrait neutral', rawtherapee: 'Portrait neutral v3' });
     assert.deepEqual(recipe.heuristics.extensions, ['raf']);
-    await run(['init', base, '--name', 'August portraits', '--map', 'darktable=Portrait neutral', '--map', 'rawtherapee=Portrait neutral v3', '--recommend', 'rawtherapee', '--force']);
+    assert.equal(recipe.note, 'Protect warm skin tones');
+    await run(['init', base, '--name', 'August portraits', '--map', 'darktable=Portrait neutral', '--map', 'rawtherapee=Portrait neutral v3', '--recommend', 'rawtherapee', '--note', 'Protect warm skin tones', '--force']);
     assert.equal(await readFile(path, 'utf8'), first);
   } finally { await rm(base, { recursive: true, force: true }); }
 });
@@ -157,12 +158,21 @@ test('@claim:cli-offline completes with network syscalls denied', async () => {
     const result = spawnSync(binary, ['demo', '--output', join(base, 'demo')], { env: { ...process.env, LD_PRELOAD: library, NETWORK_DENY_LOG: log }, timeout: 8_000 });
     assert.equal(result.status, 0);
     await assert.rejects(stat(log), (error) => error.code === 'ENOENT');
+    const runtimeSource = `${await readFile(resolve(root, 'cli/src/main.rs'), 'utf8')}\n${await readFile(resolve(root, 'cli/src/lib.rs'), 'utf8')}\n${await readFile(resolve(root, 'cli/Cargo.toml'), 'utf8')}`;
+    assert.doesNotMatch(runtimeSource, /reqwest|ureq|telemetry|analytics|std::net/i);
   } finally { await rm(base, { recursive: true, force: true }); }
 });
 
 test('@claim:build-outputs produces the release binary and deployable site', async () => {
   assert.equal((await stat(binary)).isFile(), true);
+  assert.deepEqual(await readdir(resolve(root, 'dist/bin')), [`folder-recipe${process.platform === 'win32' ? '.exe' : ''}`]);
   for (const file of ['index.html', 'demo/index.html', 'privacy/index.html', 'terms/index.html', '404.html', 'sw.js']) assert.equal((await stat(join(siteRoot, file))).isFile(), true);
+});
+
+test('@claim:scope-boundary exposes recording tools but no photo-editing or catalogue command', async () => {
+  const help = (await run(['--help'])).stdout;
+  for (const command of ['demo', 'init', 'inspect', 'checklist']) assert.match(help, new RegExp(`\\b${command}\\b`));
+  assert.doesNotMatch(help, /\b(edit|apply|catalogue|catalog)\b/i);
 });
 
 test('@claim:web-demo-isolated opens in one click, resets, and offers a real start', async () => {
@@ -194,9 +204,12 @@ test('@claim:browser-private keeps selected recipes in memory and requests only 
         const directory = await navigator.storage.getDirectory();
         for await (const _entry of directory.values()) opfs += 1;
       }
-      return { local: localStorage.length, session: sessionStorage.length, cookies: document.cookie, databases: indexedDB.databases ? (await indexedDB.databases()).length : 0, opfs };
+      const cached = (await caches.keys()).flatMap(() => []);
+      for (const key of await caches.keys()) cached.push(...(await (await caches.open(key)).keys()).map((request) => request.url));
+      return { local: localStorage.length, session: sessionStorage.length, cookies: document.cookie, databases: indexedDB.databases ? (await indexedDB.databases()).length : 0, opfs, cached };
     });
-    assert.deepEqual(state, { local: 0, session: 0, cookies: '', databases: 0, opfs: 0 });
+    assert.deepEqual({ ...state, cached: undefined }, { local: 0, session: 0, cookies: '', databases: 0, opfs: 0, cached: undefined });
+    assert.equal(state.cached.every((url) => new URL(url).origin === origin && !url.includes('Private')), true);
   } finally { await context.close(); }
 });
 
