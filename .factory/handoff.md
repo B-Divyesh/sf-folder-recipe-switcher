@@ -1,51 +1,104 @@
-# Folder Recipe v0.1.0 handoff — verification FAIL
+# Folder Recipe v0.1.0 repair handoff — PASS
 
-## Current independent-verification status (2026-08-28 UTC)
+## Release repaired
 
-**FAIL for candidate `dc22c845aab808a6d695c669cc376b200b6f980a` at <https://folder-recipe-switcher.sociobot.in/>.** The deployed files are byte-identical to the candidate and all CLI/site functional checks pass, but the PWA update contract fails: a fixed `folder-recipe-v1` cache stores `/` and serves it cache-first, while normal content-only builds do not revise `sw.js`. Previously controlled browsers can remain on the old shell indefinitely. Live hashed assets also return only `cache-control: public, must-revalidate, max-age=30`, not immutable long-lived caching.
+The two release blockers recorded in `.factory/verification.md` for candidate
+`dc22c845aab808a6d695c669cc376b200b6f980a` are repaired and deployed.
 
-See `.factory/verification.md` for exact commands, test coverage, response evidence, severity, and retest conditions. This verification supersedes the prior builder self-report below.
+- **P1 — controlled clients receive future releases:** `npm run build:site`
+  now generates `dist/site/sw.js` from the complete precached shell. Its cache
+  name is a SHA-256-derived revision (for this release,
+  `folder-recipe-9294949c86b58a18`), so any shell or asset change produces a
+  changed worker. Navigations are network-first with a cached document
+  fallback, while static shell assets remain available cache-first offline.
+  Registration uses `updateViaCache: 'none'`; workers skip waiting, claim
+  clients, and remove only prior Folder Recipe caches.
+- **P2 — immutable hashed assets:** Azure Static Web Apps routing in
+  `site/public/staticwebapp.config.json` sends
+  `Cache-Control: public, max-age=31536000, immutable` for `/assets/*`.
+  HTML routes remain short/revalidating and `/sw.js` is `no-cache`. A portable
+  `_headers` file carries the same policy for compatible static hosts.
 
-## What shipped
+The repaired application is commit `fa32379` (`fix(site): version service
+worker updates and asset caching`) and is deployed at
+<https://folder-recipe-switcher.sociobot.in/> using `dist/site`.
 
-- A Rust single-binary CLI with a documented, typed manifest API and three non-interactive commands:
-  - `init` writes only `.photo-recipe.json`, records explicit editor/profile mappings plus camera, source and extension clues, infers source/extensions when omitted, and refuses overwrite unless `--force` is explicit.
-  - `inspect` resolves the direct or nearest inherited manifest, reports its provenance and recommendation, scans immediate folder file count/size/extensions, and emits actionable mismatch/empty-state warnings. `--json` is stable for scripts.
-  - `checklist` walks a mixed archive and exports deterministic Markdown or JSON steps for every manifested folder, with safe overwrite behavior.
-- Rust tests cover the README workflow, inheritance, invalid JSON exit behavior, overwrite safety, deterministic checklist order, schema validation, and proof that inspection does not change an original.
-- A static Vite documentation site with a local-only manifest inspector, useful empty/error states, offline service-worker shell, keyboard feedback, 390 px responsive layout, and privacy/terms pages.
-- An original 1536×1024 cinematic archive hero, generated with the required factory image deployment and optimized to a 39 KB WebP. Prompt and deployment metadata live in `.factory/design.md` and `.factory/provenance/archive-room.json`.
-- MIT license, README/API usage, changelog, visual thesis, robots/sitemap, and a publishable Cargo package.
+## Regression coverage
 
-## Build and deploy
+- The static-site contracts verify the generated revisioned worker, each
+  Vite-hashed asset in its precache list, its network-first navigation policy,
+  the Azure routing policy, and that a changed shell produces a changed worker
+  revision.
+- The Playwright browser test runs on desktop Chromium and 390×844 mobile. It
+  starts with a controlled client, stages a changed HTML shell plus a changed
+  hashed JavaScript URL at the same origin, calls the normal worker update
+  path, reloads without clearing site data, and proves the new shell and new
+  asset were requested.
+
+## Exact verification evidence (2026-08-28 UTC)
 
 ```sh
-npm install
+npm ci
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets -- -D warnings
 npm test
 npm run build
+cargo package --manifest-path cli/Cargo.toml --allow-dirty
 ```
 
-The exact static deploy root is `dist/site` with `dist/site/index.html`. The release binary is copied to `dist/bin/folder-recipe` on Linux. The factory can prepare the registry artifact without publishing by running:
+- `npm ci`: pass; 0 audit vulnerabilities.
+- Rust formatting and Clippy: pass with warnings denied.
+- `npm test`: pass — 4 Rust library tests, 2 CLI integration tests, 5
+  static-site contracts, and 8 Playwright tests (4 scenarios on desktop and
+  390 px mobile). The browser coverage includes keyboard activation, manifest
+  errors, privacy/legal routes, offline shell, Axe serious/critical scan, and
+  the controlled-client update regression.
+- `npm run build`: pass; release binary at `dist/bin/folder-recipe` and static
+  deploy root at `dist/site`.
+- `cargo package --manifest-path cli/Cargo.toml --allow-dirty`: pass; package
+  verification succeeded (8 files; 40.7 KiB unpacked / 11.8 KiB compressed).
+  A fresh extracted-package `cargo install --root` consumer completed and its
+  `folder-recipe 0.1.0 --version` and `--help` succeeded.
+- Live `verify-url.sh`: HTTPS 200, 888 ms browser load, no console/page
+  errors, title/lang/one `h1`/`main`/image alts/button labels all valid.
+- Live desktop and 390 px Axe scans: 0 serious/critical violations; no
+  console errors; all runtime requests stayed on
+  `https://folder-recipe-switcher.sociobot.in`; the first Tab focused the skip
+  link with the designed `rgb(255, 180, 84)` 3 px outline.
+- Live worker check: activated worker controlled the page, cache name was
+  `folder-recipe-9294949c86b58a18`, and an offline controlled reload retained
+  exactly one `main` landmark.
+- Live response policy: `/sw.js` returned `cache-control: no-cache`; both
+  `/assets/index-C4NnQX5H.js` and `/assets/index-CYrgvcOE.css` returned
+  `cache-control: public, max-age=31536000, immutable`. HSTS, `nosniff`, and
+  strict-origin referrer policy remained present.
+- Live identity: SHA-256 matched `dist/site` for `/`, `/sw.js`, the CSS and
+  JavaScript assets, and `/archive-room.webp`.
+- Mobile Lighthouse report: Performance 100, Accessibility 100, Best
+  Practices 100, SEO 100; LCP 1,030 ms, CLS 0, TBT 8 ms. Lighthouse wrote the
+  JSON report and then reported a headless final-screenshot/BFCache tab crash;
+  the independent Playwright checks above completed normally.
+
+## Build, verify, and deploy
 
 ```sh
+npm ci
+npm test
+npm run build
 cargo package --manifest-path cli/Cargo.toml
+/opt/fleet/lib/deploy-static.sh folder-recipe-switcher dist/site
 ```
 
-## Verification completed (2026-08-27 UTC)
-
-- `npm test`: pass — 4 Rust unit tests, 2 Rust CLI integration tests, 3 static-site contract tests, and 6 Playwright scenarios (desktop Chromium + Chromium at 390×844).
-- Playwright axe scan: 0 serious or critical violations in both viewport projects.
-- Browser workflow: sample manifest, invalid upload recovery, keyboard activation, privacy route, service-worker offline reload, and console monitoring all pass; 0 console/page errors.
-- `/opt/fleet/lib/verify-url.sh`: HTTP 200; title present; `lang=en`; exactly one `h1`; main landmark present; 0 missing image alts; 0 unlabeled buttons; 0 console errors; observed local load 544 ms.
-- Lighthouse mobile: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 1.0 s, LCP 1.0 s, CLS 0, TBT 0 ms.
-- Production payload: 4.32 KB JS, 9.38 KB CSS, 39 KB hero WebP; no fonts and no third-party runtime resources. All are comfortably inside the 200/50/120/300 KB budgets.
-- `npm audit --audit-level=high`: 0 vulnerabilities.
-- `npm run build`: pass; `dist/site/index.html` and `dist/bin/folder-recipe` created.
-- `cargo package --manifest-path cli/Cargo.toml --allow-dirty`: pass; packaged 8 files and verified a clean compile.
+Do not publish the Cargo package from this repository; the factory owns
+registry credentials.
 
 ## Known gaps and next steps
 
-- Camera model data is intentionally explicit rather than extracted from EXIF; the zero/low-dependency v1 infers sources from extensions and file sizes only. A future optional adapter can add read-only EXIF detection without changing schema v1.
-- No cross-platform prebuilt binaries are committed. The factory release pipeline should build/sign binaries from the verified Cargo package.
-- Checklist discovery includes folders that own a manifest; inherited child folders remain visible through `inspect` but are not guessed as import jobs. This avoids treating arbitrary archive subdirectories as shoots.
-- No editor adapter applies a profile automatically. That is a stated non-goal: v1 records and verifies intent without touching RAW pixels, sidecars, or editor catalogues.
+- Camera model data remains explicit rather than read from EXIF. A future
+  read-only adapter can add detection without changing schema v1.
+- No cross-platform prebuilt binaries are committed; the factory release
+  pipeline should build/sign them from the verified Cargo package.
+- Checklist discovery deliberately includes folders owning a manifest rather
+  than guessing arbitrary inherited children as import jobs.
+- No editor adapter applies a profile automatically. Folder Recipe records and
+  verifies intent without touching RAW pixels, sidecars, or catalogues.
