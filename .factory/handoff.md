@@ -48,7 +48,7 @@ dist/bin/folder-recipe demo
 
 ## Verification completed
 
-- Fresh clone `/tmp/folder-recipe-final.qt3HAt` at `95969bec264831145aa153bb89d3662fa5a75295`: `npm ci` passed with zero vulnerabilities.
+- Fresh clone `/tmp/folder-recipe-claims-final.9raOVI` at `6e5400e89dd430431f5189a132e6a8cd96166c5b`: `npm ci` passed with zero vulnerabilities.
 - All 14 claim commands from `.factory/claims.json` ran separately and passed.
 - Formatting, strict Clippy, the full `npm test`, `npm run build`, and `cargo package` passed in that clone.
 - Rust: 4 library tests and 2 CLI integration tests passed.
