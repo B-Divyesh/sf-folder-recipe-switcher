@@ -1,60 +1,43 @@
-# Folder Recipe polish 2 handoff — PASS
+# Folder Recipe review 3 handoff — FAIL
 
-**Work order:** `folder-recipe-switcher-polish-2`
+**Work order:** `folder-recipe-switcher-review-3`
 
-**Repair commits:** `3a0e09e2e42c447063b0dee1639780ee970c2ba8`, `1d7f89ef516fd34f3b127eb790de004cf7358792`
-
-**Deployment ID:** `fde52489-3148-4902-910d-9d07d429f762`
+**Reviewed candidate:** `2ecfb535e1c9d251e33dbccb9148b6f29a59ac8f`
 
 **Live URL:** <https://folder-recipe-switcher.sociobot.in/>
 
-## What changed
+## What was done
 
-- Replaced the four inconsistent visitor terms from review 2 and removed related “direct/manifest/mapping/clue” wording from user-facing site, README, and CLI output.
-- Revised the first-screen local-operation fact and its `cli-offline` ledger entry so the exact promise, location, and network-denied test align.
-- Restored heading focus and live-region announcements after browser Back in the app and static legal/404 routes.
-- Added desktop and 390 px regressions for app and legal-route Back behavior.
-- Updated the route build ID, changelog, copy audit, catalog description, and complete finding map.
-- Preserved the single-binary Rust artifact, static Vite deployment, in-memory browser demo, and blue-hour archive visual system.
+- Performed a cold first read at 390×844 and 1440×900.
+- Audited landing, rendered-state, and README copy with word counts.
+- Exercised the one-click browser demo, Reset, Start for real, selected-file
+  privacy, offline reload, Back focus, routes, links, metadata, keyboard, touch,
+  Axe, and the factory URL verifier.
+- Read and rechecked every earlier review, polish, handoff, and verification
+  finding against live and source.
+- Ran all 14 claim commands independently from a clean clone, then ran the
+  aggregate suite and the real CLI demo in a new temporary directory.
+- Verified the advertised Git install in a fresh prefix and compared live
+  artifacts byte-for-byte with the clean build.
+- Wrote `.factory/review-3.md`. No product code was modified.
 
-## Exact verification
+## Verification result
 
-Final clean clone `/tmp/folder-recipe-polish2-final.ow5mUw` at `b6758bf`:
+- All 14 listed claim commands: PASS.
+- `npm test`: PASS (6 Rust, 6 static, 14 claim, 14 Playwright checks).
+- Browser demo isolation: PASS; same-origin requests only and zero
+  local/session/cookie/IndexedDB/OPFS persistence.
+- Offline demo reload/reset: PASS.
+- CLI temp-directory demo: PASS; clean clone unchanged.
+- Live artifact equality and link crawl: PASS.
+- Review verdict: **FAIL**. Blocking findings are F-1-2, F-1-33, F-1-36, and
+  F-3-1. Additional major/minor findings are documented in the review.
 
-```sh
-npm ci
-# Every `test` command in .factory/claims.json, run separately: 14/14 passed
-cargo fmt --all -- --check
-cargo clippy --workspace --all-targets -- -D warnings
-npm test
-npm run build
-cargo package --manifest-path cli/Cargo.toml
-```
+## What remains
 
-- `npm ci`: 0 vulnerabilities.
-- Rust: 4 library tests and 2 CLI integration tests passed.
-- Static contracts: 6 passed.
-- Claims: 14 unique ledger entries, exactly one tagged test each, 14 passed.
-- Browser: 14 passed across desktop Chromium and 390×844 mobile.
-- Accessibility: Playwright Axe found zero serious/critical issues; the factory URL verifier found one title, `lang=en`, one `h1`, one `main`, all image alt attributes, and zero console errors.
-- Privacy: full demo/selected-file flow contacted only the product origin; local/session storage, cookies, IndexedDB, and OPFS remained empty.
-- Offline: controlled `/demo/` reloaded offline and reset the bundled sample.
-- Package: `cargo package` produced and verified 8 files, 44.8 KiB unpacked and 12.6 KiB compressed.
-- Performance: live Lighthouse scored 100 performance, 100 accessibility, 100 best practices, and 100 SEO; LCP 895 ms, CLS 0, TBT 0 ms.
-- Payload: 2,493 B gzip JS, 3,237 B gzip CSS, no fonts, 39,312 B hero.
-
-## Live recheck
-
-- `/`, `/demo/`, `/privacy/`, and `/terms/` return 200 with unique titles, one heading/main, canonical, description, social card, icons, and shared shell.
-- `/not-a-real-page` returns the designed 404 with Home and Demo links.
-- `/?demo=1` loads the sample in one click, focuses its heading, shows the persistent banner, resets, and exits without retaining sample data.
-- Browser Back restores `#hero-title` and announces “Save photo editor profiles beside folders.” Privacy-route Back focuses and announces its `h1`.
-- At 390×844 all three first-screen facts end above y=642 px, with no horizontal overflow.
-- Root HTML, hashed JS/CSS, hero, and service worker match local `dist/site` by SHA-256.
-- Live headers include CSP with `frame-ancestors 'none'`, Permissions Policy, `DENY`, nosniff, strict referrer policy, no-cache service worker, and immutable hashed assets.
-
-Evidence is under `.factory/evidence/polish-2/`; the per-finding map is `.factory/polish-2.md`.
-
-## Known gaps and next steps
-
-None. No review finding, failed gate, TODO, stub, deployment mismatch, or deferred severity remains.
+Repair every finding in `.factory/review-3.md`, including the mobile first-demo
+viewport, terminology and demo metadata regressions, invisible file-input
+focus, incomplete/unlisted claim coverage, undersized touch targets, landmark
+semantics, jargon, and copy-audit accuracy. Rerun the entire review from
+scratch; do not accept the current passing aggregate suite as coverage for
+those gaps.
