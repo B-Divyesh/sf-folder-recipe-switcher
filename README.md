@@ -18,7 +18,7 @@ The browser demo is at <https://folder-recipe-switcher.sociobot.in/demo/>. Its s
 
 ## Install
 
-Build the single binary from source:
+Build the Folder Recipe command from its Rust source:
 
 ```sh
 cargo install --path cli
@@ -65,7 +65,7 @@ Run `folder-recipe --help` or `folder-recipe <command> --help` for every option.
 
 Success exits `0`. Invalid input or an unsafe overwrite exits `2`. An input or output failure exits `1`.
 
-Schema version `1` is deterministic and accepts unknown fields. Other schema versions return a clear error.
+Version 1 recipe files produce the same text each time and ignore extra fields. Other recipe file versions return an error that names version 1.
 
 ## Develop and verify
 
@@ -84,13 +84,17 @@ Run all checks with `npm test`.
 
 Do not publish from this repository. The factory owns publishing credentials.
 
+## Deploy
+
+Run `npm run build`, then deploy the generated `dist/site` directory as a static site. The factory handles production deployment.
+
 ## Privacy and limits
 
-The command-line tool has no telemetry or network code. It works while network system calls are denied.
+The command-line tool sends no usage data and runs without a network connection.
 
-Folder Recipe changes only the recipe file or checklist path you request. Tests hash sample photos and sidecars around init, inspect, and checklist.
+Folder Recipe changes only the recipe file or checklist path you request. Tests verify that sample photos and editor sidecar files stay unchanged during init, inspect, and checklist.
 
-The browser checker requests only this site. It does not store selected recipe files in cookies, browser storage, IndexedDB, or OPFS.
+The browser checker requests only this site. It does not save selected recipe files in cookies or any browser storage.
 
 Folder Recipe does not edit photos or apply editor profiles. It records choices for you to use in your editor.
 

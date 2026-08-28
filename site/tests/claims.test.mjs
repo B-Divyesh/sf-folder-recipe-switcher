@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
 import { mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { dirname, extname, join, resolve } from 'node:path';
+import { dirname, extname, join, relative, resolve } from 'node:path';
 import { promisify } from 'node:util';
 import { after, before, test } from 'node:test';
 import { chromium } from 'playwright';
@@ -14,6 +14,7 @@ const root = resolve(import.meta.dirname, '../..');
 const siteRoot = resolve(root, 'dist/site');
 const binary = resolve(root, `dist/bin/folder-recipe${process.platform === 'win32' ? '.exe' : ''}`);
 const contentTypes = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript', '.jpg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.xml': 'application/xml' };
+const publicSitePath = /^\/(?:|demo\/?|privacy\/?|terms\/?|404\.html|assets\/[A-Za-z0-9._-]+\.(?:js|css)|(?:archive-room|social-card)\.(?:webp|jpg)|(?:folder-mark\.svg|apple-touch-icon\.png|legal\.css|route\.js|sw\.js))$/;
 let server;
 let origin;
 let browser;
@@ -51,6 +52,23 @@ after(async () => {
 async function temp() { return mkdtemp(join(tmpdir(), 'folder-recipe-claim-')); }
 async function run(args, options = {}) { return execFile(binary, args, { timeout: 8_000, ...options }); }
 async function digest(path) { return createHash('sha256').update(await readFile(path)).digest('hex'); }
+async function fileMap(folder) {
+  const entries = {};
+  async function visit(path) {
+    for (const entry of await readdir(path, { withFileTypes: true })) {
+      const child = join(path, entry.name);
+      if (entry.isDirectory()) await visit(child);
+      else if (entry.isFile()) entries[relative(folder, child)] = await digest(child);
+    }
+  }
+  await visit(folder);
+  return Object.fromEntries(Object.entries(entries).sort(([a], [b]) => a.localeCompare(b)));
+}
+function changedPaths(before, after) {
+  return [...new Set([...Object.keys(before), ...Object.keys(after)])]
+    .filter((path) => before[path] !== after[path])
+    .sort();
+}
 async function init(folder, name, profile = 'Portrait neutral v3') {
   return run(['init', folder, '--name', name, '--map', `rawtherapee=${profile}`, '--map', 'darktable=Portrait neutral', '--recommend', 'rawtherapee', '--camera', 'Fujifilm X-T5', '--source', 'camera-raw', '--note', 'Protect warm skin tones']);
 }
@@ -164,13 +182,38 @@ test('@claim:future-fields accepts unknown fields and rejects unknown schema ver
   } finally { await rm(base, { recursive: true, force: true }); }
 });
 
-test('@claim:cli-offline completes with network syscalls denied', async () => {
+test('@claim:cli-offline sends no usage data and runs without a network connection', async () => {
   const base = await temp();
   try {
     const library = join(base, 'deny-network.so'); const log = join(base, 'network.log');
     const built = spawnSync('cc', ['-shared', '-fPIC', resolve(root, 'site/tests/deny-network.c'), '-o', library]); assert.equal(built.status, 0);
-    const result = spawnSync(binary, ['demo', '--output', join(base, 'demo')], { env: { ...process.env, LD_PRELOAD: library, NETWORK_DENY_LOG: log }, timeout: 8_000 });
-    assert.equal(result.status, 0);
+    const environment = { ...process.env, LD_PRELOAD: library, NETWORK_DENY_LOG: log };
+    const demo = join(base, 'demo');
+    const shoot = join(demo, '2026-08-portraits');
+    const selects = join(shoot, 'selects');
+    const command = (args) => spawnSync(binary, args, { env: environment, timeout: 8_000, encoding: 'utf8' });
+
+    const demoResult = command(['demo', '--output', demo]);
+    assert.equal(demoResult.status, 0, demoResult.stderr);
+    const afterDemo = await fileMap(demo);
+    assert.equal(afterDemo['2026-08-portraits/DSCF1842.RAF'] !== undefined, true);
+    assert.equal(afterDemo['family-negatives/roll-07-frame-12.tiff'] !== undefined, true);
+
+    const initResult = command(['init', shoot, '--name', 'Network-denied portraits', '--map', 'rawtherapee=Portrait neutral v3', '--recommend', 'rawtherapee', '--force']);
+    assert.equal(initResult.status, 0, initResult.stderr);
+    const afterInit = await fileMap(demo);
+    assert.deepEqual(changedPaths(afterDemo, afterInit), ['2026-08-portraits/.photo-recipe.json']);
+
+    const inspectResult = command(['inspect', selects, '--json']);
+    assert.equal(inspectResult.status, 0, inspectResult.stderr);
+    assert.deepEqual(await fileMap(demo), afterInit);
+
+    const beforeChecklist = await fileMap(base);
+    const checklist = join(base, 'import-checklist.md');
+    const checklistResult = command(['checklist', demo, '--output', checklist]);
+    assert.equal(checklistResult.status, 0, checklistResult.stderr);
+    assert.deepEqual(changedPaths(beforeChecklist, await fileMap(base)), ['import-checklist.md']);
+    assert.match(await readFile(checklist, 'utf8'), /2026-08-portraits/);
     await assert.rejects(stat(log), (error) => error.code === 'ENOENT');
     const runtimeSource = `${await readFile(resolve(root, 'cli/src/main.rs'), 'utf8')}\n${await readFile(resolve(root, 'cli/src/lib.rs'), 'utf8')}\n${await readFile(resolve(root, 'cli/Cargo.toml'), 'utf8')}`;
     assert.doesNotMatch(runtimeSource, /reqwest|ureq|telemetry|analytics|std::net/i);
@@ -261,7 +304,41 @@ test('@claim:browser-private keeps selected recipes in memory and requests only 
       return { local: localStorage.length, session: sessionStorage.length, cookies: document.cookie, databases: indexedDB.databases ? (await indexedDB.databases()).length : 0, opfs, cached };
     });
     assert.deepEqual({ ...state, cached: undefined }, { local: 0, session: 0, cookies: '', databases: 0, opfs: 0, cached: undefined });
-    assert.equal(state.cached.every((url) => new URL(url).origin === origin && !url.includes('Private')), true);
+    assert.equal(state.cached.every((url) => new URL(url).origin === origin && publicSitePath.test(new URL(url).pathname) && !url.includes('Private')), true);
+  } finally { await context.close(); }
+});
+
+test('@claim:site-no-tracking has no analytics, ads, cookies, accounts, or third-party scripts', async () => {
+  const context = await browser.newContext(); const page = await context.newPage(); const requests = [];
+  page.on('request', (request) => requests.push(request.url()));
+  try {
+    for (const path of ['/', '/demo/', '/privacy/', '/terms/']) {
+      await page.goto(`${origin}${path}`);
+      await page.waitForLoadState('domcontentloaded');
+      const scripts = await page.locator('script').evaluateAll((elements) => elements.map((element) => ({ src: element.src, inline: element.textContent?.trim() ?? '' })));
+      for (const script of scripts) {
+        assert.equal(new URL(script.src).origin, origin, `script must be self-hosted: ${script.src}`);
+        assert.equal(script.inline, '', 'the site has no inline tracking script');
+      }
+      assert.equal(await page.locator('form').count(), 0, 'the site has no account or payment form');
+      assert.equal(await page.locator('input:not([type="file"])').count(), 0, 'the site has no account input');
+    }
+    await page.goto(`${origin}/demo/`);
+    await page.locator('#manifest-file').setInputFiles({ name: '.photo-recipe.json', mimeType: 'application/json', buffer: Buffer.from('{"schema_version":1,"name":"Private","recommended_editor":"darktable","editor_mappings":{"darktable":"Neutral"}}') });
+    await page.getByRole('heading', { name: 'Private' }).waitFor();
+
+    assert.ok(requests.length > 0, 'the browser flow made the expected first-party requests');
+    for (const url of requests) {
+      const request = new URL(url);
+      assert.equal(request.origin, origin, `unexpected third-party request: ${url}`);
+      assert.match(request.pathname, publicSitePath, `unexpected first-party request: ${request.pathname}`);
+    }
+    assert.deepEqual(await context.cookies(), []);
+    assert.equal(await page.evaluate(() => document.cookie), '');
+
+    const runtimeScripts = await page.locator('script[src]').evaluateAll((elements) => elements.map((element) => new URL(element.src).pathname));
+    const runtimeSource = await Promise.all(runtimeScripts.map((path) => readFile(resolve(siteRoot, path.slice(1)), 'utf8')));
+    assert.doesNotMatch(runtimeSource.join('\n'), /google-analytics|gtag\(|plausible|fathom|matomo|mixpanel|hotjar|segment|amplitude|sendBeacon|\/(?:collect|analytics|ads|tracking)(?:[/'"]|$)|\b(?:login|sign.?up|auth|checkout|payment)\b/i);
   } finally { await context.close(); }
 });
 

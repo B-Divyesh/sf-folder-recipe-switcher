@@ -1,1 +1,1 @@
-Save photo editor profiles beside folders and export import checklists locally.
+Save photo editor profiles beside folders and export local import checklists.
