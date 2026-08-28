@@ -66,5 +66,5 @@ fn invalid_manifest_is_script_friendly() {
         .output()
         .unwrap();
     assert_eq!(result.status.code(), Some(2));
-    assert!(String::from_utf8_lossy(&result.stderr).contains("invalid manifest JSON"));
+    assert!(String::from_utf8_lossy(&result.stderr).contains("invalid recipe file JSON"));
 }

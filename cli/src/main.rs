@@ -14,7 +14,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
     name = "folder-recipe",
     version,
     about = "Save photo editor profiles beside folders",
-    long_about = "Write a .photo-recipe.json beside a photo folder, show the direct or nearest inherited recipe, and export an import checklist. Folder Recipe never modifies photos or editor sidecars."
+    long_about = "Write a .photo-recipe.json recipe file beside a photo folder, show whether that folder or its nearest parent supplied it, and export an import checklist. Folder Recipe never modifies photos or editor sidecars."
 )]
 struct Cli {
     #[command(subcommand)]
@@ -29,23 +29,23 @@ enum Command {
         #[arg(long)]
         output: Option<PathBuf>,
     },
-    /// Write a versioned recipe manifest beside a photo folder
+    /// Write a versioned recipe file beside a photo folder
     Init {
         /// Existing photo folder to describe
         folder: PathBuf,
         /// Human-readable folder or shoot name
         #[arg(long)]
         name: String,
-        /// Explicit mapping in EDITOR=PROFILE form; repeat for every editor
+        /// Editor profile in EDITOR=PROFILE form; repeat for every editor
         #[arg(long = "map", value_name = "EDITOR=PROFILE", required = true)]
         mappings: Vec<String>,
-        /// Editor mapping recommended for this folder (defaults to the sole mapping)
+        /// Editor recommended for this folder (defaults to the sole editor profile)
         #[arg(long)]
         recommend: Option<String>,
-        /// Camera model clue; repeat for mixed-camera folders
+        /// Camera model; repeat for mixed-camera folders
         #[arg(long)]
         camera: Vec<String>,
-        /// Source clue such as camera-raw, film-scan, or derivative
+        /// Source such as camera-raw, film-scan, or derivative
         #[arg(long)]
         source: Vec<String>,
         /// Expected extension without a dot; defaults to observed extensions
@@ -57,7 +57,7 @@ enum Command {
         /// Replace an existing .photo-recipe.json; never touches other files
         #[arg(long)]
         force: bool,
-        /// Print the created manifest as JSON
+        /// Print the created recipe file as JSON
         #[arg(long)]
         json: bool,
     },
@@ -69,7 +69,7 @@ enum Command {
         #[arg(long)]
         json: bool,
     },
-    /// Export explicit editor/profile steps for manifested folders below a root
+    /// Export editor profile steps for folders with recipe files below a root
     Checklist {
         /// Archive root to scan recursively
         root: PathBuf,
@@ -204,7 +204,7 @@ fn run(cli: Cli) -> Result<()> {
                     if inspection.inherited {
                         "inherited"
                     } else {
-                        "direct"
+                        "saved in this folder"
                     }
                 );
                 println!(
@@ -214,7 +214,7 @@ fn run(cli: Cli) -> Result<()> {
                 );
                 for (editor, profile) in &inspection.recipe.editor_mappings {
                     if editor != &inspection.recipe.recommended_editor {
-                        println!("Mapped: {editor} → {profile}");
+                        println!("Saved profile: {editor} → {profile}");
                     }
                 }
                 println!(

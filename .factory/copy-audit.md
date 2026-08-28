@@ -1,6 +1,6 @@
-# Copy audit — polish 1
+# Copy audit — polish 2
 
-Whitespace-delimited counts exclude code blocks, filenames, navigation labels, and terminal output. No sentence exceeds 22 words. No banned marketing word appears.
+Whitespace-delimited counts exclude code blocks, filenames used as code, navigation labels, and terminal output. The audit includes the rendered demo and error states. No sentence exceeds 22 words. No banned marketing word appears.
 
 ## Landing-page sentences
 
@@ -12,7 +12,7 @@ Whitespace-delimited counts exclude code blocks, filenames, navigation labels, a
 | 13 | A folder uses its own recipe file or the nearest one above it. |
 | 9 | Inspect shows the source before you open an editor. |
 | 11 | Name each editor profile and record why it fits the shoot. |
-| 11 | See the direct or inherited recipe beside file counts and extensions. |
+| 16 | See whether this folder or a parent saved the recipe file, beside file counts and types. |
 | 12 | Create editor and profile steps for every folder with a recipe file. |
 | 4 | Choose a `.photo-recipe.json` file. |
 | 9 | Your browser checks it without uploading or storing it. |
@@ -30,15 +30,32 @@ Whitespace-delimited counts exclude code blocks, filenames, navigation labels, a
 | 1 | Offline. |
 | 7 | The demo and recipe file checker remain available. |
 
+## Rendered demo and error states
+
+| Words | Sentence or label |
+| ---: | --- |
+| 7 | Check saved profiles in a sample shoot. |
+| 6 | Demo — sample data, nothing is saved. |
+| 7 | Camera, source, and file types. |
+| 3 | Saved editor profiles. |
+| 5 | No folder note recorded. |
+| 8 | No camera, source, or file types recorded. |
+| 5 | Could not read recipe file. |
+| 5 | Check this recipe file. |
+| 6 | Schema version 2 is not supported. |
+| 3 | Use version 1. |
+| 13 | Choose a version 1 recipe file or run `folder-recipe inspect --json` to diagnose it. |
+| 8 | Demo reset to the bundled portrait sample. |
+
 ## Interface labels and headings
 
-All labels name their destination or result: “Demo,” “How it works,” “Privacy,” “Try it with sample data,” “Install Folder Recipe,” “Save profiles,” “Check a folder,” “Export a checklist,” “Choose recipe file,” “Try the sample recipe file,” “Reset demo,” and “Start for real.”
+The page uses “Photo editor profiles for each folder,” “Saved in this folder,” “Camera, source, and file types,” and “Saved editor profiles.” These labels replace the competing *settings*, *direct*, *clues*, and *mappings* terms found in review 2.
 
-The GitHub links say “opens GitHub.” Empty and error states explain what appears next and how to recover.
+Buttons and links name their results: “Try it with sample data,” “Install Folder Recipe,” “Choose recipe file,” “Try the sample recipe file,” “Reset demo,” and “Start for real.” The GitHub links name their external destination. Empty and error states explain the next result or recovery action.
 
 ## README check
 
-Every prose sentence is 22 words or fewer. The earlier 24-word opening was split into one-purpose sentences. `recipe file` is used for the visitor concept, and `.photo-recipe.json` is introduced once as its filename.
+Every prose sentence is 22 words or fewer. The opening separates audience, write behavior, filename, and format. The inheritance explanation now says whether the current folder or nearest parent supplied the recipe file.
 
 ## Terminology
 
@@ -46,8 +63,10 @@ Every prose sentence is 22 words or fewer. The earlier 24-word opening was split
 | --- | --- |
 | The per-folder JSON document | recipe file |
 | An editor-specific saved look | editor profile |
-| Settings found above the current folder | inherited recipe |
+| A recipe file supplied by a parent folder | inherited recipe |
+| A recipe file in the folder being checked | saved in this folder |
+| Camera model, source, and extensions | camera, source, and file types |
 | Exported preparation document | import checklist |
 | Browser sample state | demo |
 
-Result: **PASS**. There are no length, banned-word, jargon, or inconsistent-term flags.
+Result: **PASS**. There are no length, banned-word, unexplained-jargon, or inconsistent-term flags.

@@ -89,14 +89,14 @@ test('sample manifest works with keyboard and has no serious accessibility issue
   expect(errors).toEqual([]);
 });
 
-test('invalid manifests produce an actionable error', async ({ page }) => {
+test('invalid recipe files produce an actionable error', async ({ page }) => {
   await page.goto('/#inspect');
   await page.locator('#manifest-file').setInputFiles({
     name: '.photo-recipe.json',
     mimeType: 'application/json',
     buffer: Buffer.from('{"schema_version":2}'),
   });
-  await expect(page.getByRole('heading', { name: 'Check this manifest' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Check this recipe file' })).toBeVisible();
   await expect(page.getByText(/Schema version 2 is not supported/)).toBeVisible();
 });
 
@@ -113,13 +113,13 @@ test('legal pages and offline shell remain reachable', async ({ page, context })
   await expect(page.locator('main')).toBeVisible();
 });
 
-test('first screen explains the job and demo route restores focus', async ({ page }, testInfo) => {
+test('first screen explains the job and demo route restores focus after Back', async ({ page }, testInfo) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Save photo editor profiles beside folders' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Try it with sample data' })).toBeVisible();
   await expect(page.getByText('For photographers mixing shoots and editors')).toBeVisible();
   if (testInfo.project.name === 'mobile-390') {
-    for (const text of ['Runs on your computer', 'Does not change photos', 'Free under the MIT License']) {
+    for (const text of ['Runs locally without a network connection', 'Does not change photos', 'Free under the MIT License']) {
       const box = await page.getByText(text, { exact: true }).boundingBox();
       expect(box?.y).toBeLessThan(844);
     }
@@ -129,6 +129,10 @@ test('first screen explains the job and demo route restores focus', async ({ pag
   await expect(page).toHaveTitle('Demo — Folder Recipe');
   await expect(page.locator('h1')).toBeFocused();
   await expect(page.getByText('Demo — sample data, nothing is saved')).toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole('heading', { name: 'Save photo editor profiles beside folders' })).toBeFocused();
+  await expect(page.locator('#route-announcer')).not.toBeEmpty();
 });
 
 test('route metadata, shared shell, and designed 404 are present', async ({ page }) => {
@@ -142,6 +146,16 @@ test('route metadata, shared shell, and designed 404 are present', async ({ page
   await page.goto('/404.html');
   await expect(page).toHaveTitle('Page not found — Folder Recipe');
   await expect(page.getByRole('heading', { name: 'This page has no recipe' })).toBeVisible();
+});
+
+test('static routes restore heading focus and announcement after Back', async ({ page }) => {
+  await page.goto('/privacy/');
+  await page.getByRole('link', { name: 'Demo' }).click();
+  await expect(page.getByRole('heading', { name: 'Check saved profiles in a sample shoot' })).toBeFocused();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/privacy\/$/);
+  await expect(page.getByRole('heading', { name: 'Privacy for your photo folders' })).toBeFocused();
+  await expect(page.locator('#route-announcer')).not.toBeEmpty();
 });
 
 test('a controlled client adopts a future shell and asset graph without clearing site data', async ({ page }) => {

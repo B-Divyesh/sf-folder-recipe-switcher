@@ -163,6 +163,7 @@ test('@claim:cli-offline completes with network syscalls denied', async () => {
     await assert.rejects(stat(log), (error) => error.code === 'ENOENT');
     const runtimeSource = `${await readFile(resolve(root, 'cli/src/main.rs'), 'utf8')}\n${await readFile(resolve(root, 'cli/src/lib.rs'), 'utf8')}\n${await readFile(resolve(root, 'cli/Cargo.toml'), 'utf8')}`;
     assert.doesNotMatch(runtimeSource, /reqwest|ureq|telemetry|analytics|std::net/i);
+    assert.match(await readFile(resolve(siteRoot, 'index.html'), 'utf8'), /Runs locally without a network connection/);
   } finally { await rm(base, { recursive: true, force: true }); }
 });
 

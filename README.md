@@ -48,7 +48,7 @@ folder-recipe inspect ./2026-08-portraits/selects
 folder-recipe inspect ./2026-08-portraits/selects --json
 ```
 
-Inspect reports the direct or nearest inherited recipe file. It shows which file supplied the editor profile.
+Inspect reports whether this folder or its nearest parent supplied the recipe file. It shows which file supplied the editor profile.
 
 ## Export an import checklist
 

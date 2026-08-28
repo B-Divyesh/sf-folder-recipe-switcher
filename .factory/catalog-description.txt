@@ -1,1 +1,1 @@
-Save photo editor profiles beside folders and export import checklists with a local CLI.
+Save photo editor profiles beside folders, check inheritance, and export import checklists locally.

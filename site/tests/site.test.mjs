@@ -35,6 +35,19 @@ test('reduced motion and focus treatment are explicit', async () => {
   assert.match(css, /:focus-visible/);
 });
 
+test('route scripts restore heading focus and announce browser history navigation', async () => {
+  const [app, staticRoutes] = await Promise.all([
+    readFile(new URL('src/main.ts', root), 'utf8'),
+    readFile(new URL('public/route.js', root), 'utf8'),
+  ]);
+  for (const source of [app, staticRoutes]) {
+    assert.match(source, /getEntriesByType\(['"]navigation['"]\)/);
+    assert.match(source, /back_forward/);
+    assert.match(source, /focusHeading|title\.focus/);
+    assert.match(source, /announcer\.textContent|routeAnnouncer\.textContent/);
+  }
+});
+
 test('built site versions its service worker and declares immutable asset caching', async () => {
   const [worker, index, headers, staticWebAppConfig] = await Promise.all([
     readFile(new URL('sw.js', builtSite), 'utf8'),

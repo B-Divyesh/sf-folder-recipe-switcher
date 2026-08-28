@@ -14,12 +14,13 @@ All notable changes follow Keep a Changelog; this project uses semantic versioni
 
 - Rewrote the first screen and documentation in direct photographer language.
 - Completed the shared site shell, mobile layout, focus handling, and legal navigation.
+- Standardized recipe-file language and restored heading focus after browser Back.
 
 ## [0.1.0] - 2026-08-27
 
 ### Added
 
-- Versioned folder manifests with explicit editor/profile mappings.
-- Direct and inherited recipe inspection with folder-content signals.
+- Versioned folder recipe files with named editor profiles.
+- Current-folder and inherited recipe inspection with folder-content details.
 - Markdown and JSON import-checklist export.
-- Local-only browser manifest inspector and product documentation.
+- Local-only browser recipe-file checker and product documentation.

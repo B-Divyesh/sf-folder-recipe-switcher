@@ -1,0 +1,60 @@
+{
+  "desktop": {
+    "homeOverflow": false,
+    "demo": {
+      "title": "Demo — Folder Recipe",
+      "h1": "Check saved profiles in a sample shoot",
+      "active": "hero-title",
+      "banner": "Demo — sample data, nothing is saved Reset demoStart for real",
+      "eyebrow": "01 Photo editor profiles for each folder",
+      "status": "Saved in this folder",
+      "details": [
+        "Why",
+        "Camera, source, and file types",
+        "Saved editor profiles"
+      ]
+    },
+    "back": {
+      "url": "http://127.0.0.1:4173/",
+      "active": "hero-title",
+      "announcement": "Save photo editor profiles beside folders"
+    },
+    "storage": {
+      "local": 0,
+      "session": 0,
+      "cookies": "",
+      "indexedDb": 0
+    },
+    "errors": [],
+    "onlySameOrigin": true
+  },
+  "mobile": {
+    "homeOverflow": false,
+    "demo": {
+      "title": "Demo — Folder Recipe",
+      "h1": "Check saved profiles in a sample shoot",
+      "active": "hero-title",
+      "banner": "Demo — sample data, nothing is saved Reset demoStart for real",
+      "eyebrow": "01 Photo editor profiles for each folder",
+      "status": "Saved in this folder",
+      "details": [
+        "Why",
+        "Camera, source, and file types",
+        "Saved editor profiles"
+      ]
+    },
+    "back": {
+      "url": "http://127.0.0.1:4173/",
+      "active": "hero-title",
+      "announcement": "Save photo editor profiles beside folders"
+    },
+    "storage": {
+      "local": 0,
+      "session": 0,
+      "cookies": "",
+      "indexedDb": 0
+    },
+    "errors": [],
+    "onlySameOrigin": true
+  }
+}

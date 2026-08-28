@@ -38,7 +38,7 @@ impl fmt::Display for RecipeError {
         match self {
             Self::Invalid(message) => write!(f, "{message}"),
             Self::Io(error) => write!(f, "{error}"),
-            Self::Json(error) => write!(f, "invalid manifest JSON: {error}"),
+            Self::Json(error) => write!(f, "invalid recipe file JSON: {error}"),
         }
     }
 }
@@ -59,7 +59,7 @@ impl From<serde_json::Error> for RecipeError {
 
 pub type Result<T> = std::result::Result<T, RecipeError>;
 
-/// Human-supplied and locally observed clues about the folder's contents.
+/// Human-supplied and locally observed details about the folder's contents.
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(default)]
 pub struct Heuristics {
@@ -91,17 +91,19 @@ impl Manifest {
             )));
         }
         if self.name.trim().is_empty() {
-            return Err(RecipeError::Invalid("manifest name cannot be empty".into()));
+            return Err(RecipeError::Invalid(
+                "recipe file name cannot be empty".into(),
+            ));
         }
         if self.editor_mappings.is_empty() {
             return Err(RecipeError::Invalid(
-                "manifest needs at least one explicit editor mapping".into(),
+                "recipe file needs at least one saved editor profile".into(),
             ));
         }
         match self.editor_mappings.get(&self.recommended_editor) {
             Some(profile) if !profile.trim().is_empty() => Ok(()),
             _ => Err(RecipeError::Invalid(format!(
-                "recommended editor '{}' has no non-empty mapping",
+                "recommended editor '{}' has no saved profile",
                 self.recommended_editor
             ))),
         }
@@ -151,7 +153,7 @@ pub fn write_manifest(folder: &Path, manifest: &Manifest, force: bool) -> Result
     let path = folder.join(MANIFEST_NAME);
     if path.exists() && !force {
         return Err(RecipeError::Invalid(format!(
-            "{} already exists; pass --force to replace only that manifest",
+            "{} already exists; pass --force to replace only that recipe file",
             path.display()
         )));
     }
@@ -311,7 +313,7 @@ pub fn checklist_markdown(root: &Path, items: &[ChecklistItem]) -> String {
     output.push_str("- [ ] Import one folder at a time; do not carry settings between rows.\n\n");
     for item in items {
         output.push_str(&format!(
-            "## [ ] {}\n\n- Folder: `{}`\n- Editor: `{}`\n- Profile/style: `{}`\n",
+            "## [ ] {}\n\n- Folder: `{}`\n- Editor: `{}`\n- Editor profile: `{}`\n",
             escape_markdown(&item.name),
             item.folder.display(),
             escape_markdown(&item.editor),
@@ -328,14 +330,14 @@ pub fn checklist_markdown(root: &Path, items: &[ChecklistItem]) -> String {
 pub fn parse_mapping(value: &str) -> Result<(String, String)> {
     let (editor, profile) = value.split_once('=').ok_or_else(|| {
         RecipeError::Invalid(format!(
-            "invalid mapping '{value}'; expected EDITOR=PROFILE"
+            "invalid editor profile '{value}'; expected EDITOR=PROFILE"
         ))
     })?;
     let editor = editor.trim().to_ascii_lowercase();
     let profile = profile.trim().to_string();
     if editor.is_empty() || profile.is_empty() {
         return Err(RecipeError::Invalid(format!(
-            "invalid mapping '{value}'; editor and profile must be non-empty"
+            "invalid editor profile '{value}'; editor and profile must be non-empty"
         )));
     }
     Ok((editor, profile))
@@ -471,6 +473,6 @@ mod tests {
             .validate()
             .unwrap_err()
             .to_string()
-            .contains("no non-empty mapping"));
+            .contains("no saved profile"));
     }
 }
