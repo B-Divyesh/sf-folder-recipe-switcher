@@ -1,5 +1,75 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { createServer } from 'node:http';
+import { readFile, stat } from 'node:fs/promises';
+import { extname, resolve } from 'node:path';
+
+const siteRoot = resolve(process.cwd(), 'dist/site');
+const contentTypes = {
+  '.css': 'text/css; charset=utf-8',
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.webp': 'image/webp',
+};
+
+async function startVersionedSite() {
+  const [index, worker] = await Promise.all([
+    readFile(resolve(siteRoot, 'index.html'), 'utf8'),
+    readFile(resolve(siteRoot, 'sw.js'), 'utf8'),
+  ]);
+  const scriptPath = index.match(/<script[^>]+src="(\/assets\/[^\"]+\.js)"/)?.[1];
+  const cacheName = worker.match(/const CACHE = '([^']+)';/)?.[1];
+  if (!scriptPath || !cacheName) throw new Error('The built site does not contain a versioned worker and entry script.');
+
+  const futureScriptPath = scriptPath.replace(/\.js$/, '-future.js');
+  const futureIndex = index
+    .replace(scriptPath, futureScriptPath)
+    .replace('Folder Recipe</span>', 'Updated Folder Recipe</span>');
+  const futureWorker = worker
+    .replace(cacheName, 'folder-recipe-future-release')
+    .replaceAll(scriptPath, futureScriptPath);
+  let futureRelease = false;
+
+  const server = createServer(async (request, response) => {
+    try {
+      const pathname = decodeURIComponent(new URL(request.url ?? '/', 'http://localhost').pathname);
+      if (pathname === '/__switch-release') {
+        futureRelease = true;
+        response.writeHead(204).end();
+        return;
+      }
+      if (pathname === '/') {
+        response.writeHead(200, { 'Content-Type': contentTypes['.html'], 'Cache-Control': 'no-cache' }).end(futureRelease ? futureIndex : index);
+        return;
+      }
+      if (pathname === '/sw.js') {
+        response.writeHead(200, { 'Content-Type': contentTypes['.js'], 'Cache-Control': 'no-cache', 'Service-Worker-Allowed': '/' }).end(futureRelease ? futureWorker : worker);
+        return;
+      }
+      if (futureRelease && pathname === futureScriptPath) {
+        response.writeHead(200, { 'Content-Type': contentTypes['.js'], 'Cache-Control': 'public, max-age=31536000, immutable' }).end(await readFile(resolve(siteRoot, scriptPath.slice(1))));
+        return;
+      }
+
+      const file = resolve(siteRoot, `.${pathname}`);
+      if (!file.startsWith(`${siteRoot}/`)) throw new Error('Invalid path');
+      const details = await stat(file);
+      const resolvedFile = details.isDirectory() ? resolve(file, 'index.html') : file;
+      response.writeHead(200, { 'Content-Type': contentTypes[extname(resolvedFile)] ?? 'application/octet-stream' }).end(await readFile(resolvedFile));
+    } catch {
+      response.writeHead(404).end();
+    }
+  });
+  await new Promise((resolveServer) => server.listen(0, '127.0.0.1', resolveServer));
+  const address = server.address();
+  if (!address || typeof address === 'string') throw new Error('Could not start versioned-site fixture.');
+  return {
+    origin: `http://127.0.0.1:${address.port}`,
+    futureScriptPath,
+    close: () => new Promise((resolveServer, reject) => server.close((error) => error ? reject(error) : resolveServer())),
+  };
+}
 
 test('sample manifest works with keyboard and has no serious accessibility issues', async ({ page }) => {
   const errors = [];
@@ -41,4 +111,29 @@ test('legal pages and offline shell remain reachable', async ({ page, context })
   await context.setOffline(true);
   await page.reload();
   await expect(page.locator('main')).toBeVisible();
+});
+
+test('a controlled client adopts a future shell and asset graph without clearing site data', async ({ page }) => {
+  const fixture = await startVersionedSite();
+  const requests = [];
+  page.on('request', (request) => requests.push(new URL(request.url()).pathname));
+  try {
+    await page.goto(fixture.origin);
+    await page.waitForFunction(() => navigator.serviceWorker?.controller !== null);
+    await expect(page.getByText('Folder Recipe', { exact: true }).first()).toBeVisible();
+
+    await page.request.get(`${fixture.origin}/__switch-release`);
+    await page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.ready;
+      const controllerChanged = new Promise((resolveChange) => navigator.serviceWorker.addEventListener('controllerchange', resolveChange, { once: true }));
+      await registration.update();
+      await Promise.race([controllerChanged, new Promise((resolveTimeout) => window.setTimeout(resolveTimeout, 3_000))]);
+    });
+    await page.reload();
+
+    await expect(page.getByText('Updated Folder Recipe', { exact: true }).first()).toBeVisible();
+    expect(requests).toContain(fixture.futureScriptPath);
+  } finally {
+    await fixture.close();
+  }
 });

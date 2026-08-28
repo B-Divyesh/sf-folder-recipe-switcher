@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite --config site/vite.config.js",
     "preview": "vite preview --config site/vite.config.js --host 127.0.0.1",
-    "test": "cargo test --all-targets && node --test site/tests/*.test.mjs && npm run build:site && playwright test",
-    "build:site": "vite build --config site/vite.config.js",
+    "test": "cargo test --all-targets && npm run build:site && node --test site/tests/*.test.mjs && playwright test",
+    "build:site": "vite build --config site/vite.config.js && node scripts/build-site.mjs",
     "build": "cargo build --release && npm run build:site && node scripts/copy-binary.mjs"
   },
   "devDependencies": {

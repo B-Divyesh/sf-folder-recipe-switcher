@@ -114,5 +114,5 @@ window.addEventListener('offline', () => updateNetworkState(false));
 updateNetworkState();
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => void navigator.serviceWorker.register('/sw.js'));
+  window.addEventListener('load', () => void navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }));
 }
