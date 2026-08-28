@@ -72,7 +72,6 @@ h2 { margin: 0 0 24px; font-size: clamp(40px, 5vw, 66px); line-height: 1; text-w
 .recipe-rail p { max-width: 680px; margin: 0 0 16px; color: var(--silver); }
 code { color: var(--amber); font-size: .9em; overflow-wrap: anywhere; }
 
-.inspector { content-visibility: auto; }
 .light-table { display: grid; grid-template-columns: .9fr 1.1fr; min-height: 470px; margin-top: 56px; border: 1px solid var(--line); background: var(--navy); box-shadow: 0 42px 90px rgba(0,0,0,.3); }
 .drop-zone { display: grid; place-items: center; align-content: center; padding: 48px 28px; text-align: center; border-right: 1px solid var(--line); transition: background-color .18s ease; }
 .drop-zone.is-dragging { background: rgba(255,180,84,.1); }
@@ -99,7 +98,6 @@ code { color: var(--amber); font-size: .9em; overflow-wrap: anywhere; }
 .mapping-list li { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; }
 .mapping-list span { color: var(--silver); }
 
-.install { content-visibility: auto; }
 .terminal { margin-top: 48px; background: #05080b; border: 1px solid var(--line); box-shadow: 16px 16px 0 var(--slate); }
 .terminal-title { display: flex; justify-content: space-between; padding: 12px 18px; color: var(--silver); background: var(--navy); border-bottom: 1px solid var(--line); font-size: 12px; }
 .terminal pre { margin: 0; padding: 28px; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; }
@@ -113,10 +111,10 @@ footer > div { display: flex; align-items: center; gap: 12px; }
 @media (max-width: 800px) {
   .site-header { padding-top: max(16px, env(safe-area-inset-top)); }
   .site-header nav a:not(:last-child) { display: none; }
-  .hero { min-height: 840px; align-items: start; padding-top: 136px; }
+  .hero { display: block; min-height: auto; padding-top: 136px; padding-bottom: 56px; }
   .hero-art { object-position: 66% center; opacity: .72; }
   .hero-shade { background: linear-gradient(180deg, rgba(9,14,19,.9) 5%, rgba(9,14,19,.72) 60%, var(--ink) 93%); }
-  .manifest-peek { right: 20px; bottom: 48px; left: 20px; width: auto; }
+  .manifest-peek { position: relative; right: auto; bottom: auto; left: auto; width: auto; margin-top: 40px; }
   .promise { grid-template-columns: 1fr; }
   .promise p + p { border-left: 0; border-top: 1px solid var(--line); }
   .section { padding-block: 88px; }
@@ -130,7 +128,6 @@ footer > div { display: flex; align-items: center; gap: 12px; }
   .brand span { font-size: 14px; }
   .site-header nav { gap: 8px; }
   h1 { font-size: 50px; }
-  .hero { min-height: 900px; }
   .manifest-peek { padding: 16px; }
   .peek-line { display: grid; gap: 2px; }
   .peek-line strong { text-align: left; }

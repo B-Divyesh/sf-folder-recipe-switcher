@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://folder-recipe-switcher.sociobot.in/sitemap.xml
