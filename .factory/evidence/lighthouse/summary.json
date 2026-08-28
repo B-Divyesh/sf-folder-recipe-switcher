@@ -1,0 +1,12 @@
+{
+  "url": "http://127.0.0.1:4173/",
+  "tool": "Lighthouse 12.8.2 mobile defaults",
+  "performance": 100,
+  "accessibility": 100,
+  "bestPractices": 100,
+  "seo": 100,
+  "lcpMs": 1006.3158,
+  "cls": 0,
+  "totalBlockingTimeMs": 0,
+  "note": "Lighthouse wrote a complete report, then Chromium exited during final artifact collection; scored audits completed."
+}
