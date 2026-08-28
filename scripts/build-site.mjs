@@ -9,6 +9,7 @@ const index = await readFile(resolve(siteRoot, 'index.html'), 'utf8');
 const demo = index
   .replace('<body>', '<body data-force-demo="true">')
   .replace('<title>Folder Recipe — Save photo editor profiles</title>', '<title>Demo — Folder Recipe</title>')
+  .replace('name="description" content="Save editor profiles beside photo folders, check inherited recipe files, and export an import checklist."', 'name="description" content="Try Folder Recipe with an isolated sample shoot and saved editor profiles."')
   .replaceAll('content="Folder Recipe — Save photo editor profiles"', 'content="Demo — Folder Recipe"')
   .replaceAll('content="Keep each photo folder’s chosen editor profile in a readable recipe file."', 'content="Try Folder Recipe with an isolated sample shoot and saved editor profiles."')
   .replace('rel="canonical" href="https://folder-recipe-switcher.sociobot.in/"', 'rel="canonical" href="https://folder-recipe-switcher.sociobot.in/demo/"')

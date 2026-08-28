@@ -8,6 +8,7 @@
     "preview": "vite preview --config site/vite.config.js --host 127.0.0.1",
     "test": "cargo test --all-targets && npm run build:site && node --test site/tests/site.test.mjs && npm run test:claims && playwright test",
     "test:claims": "node scripts/test-claims.mjs",
+    "audit:copy": "node scripts/generate-copy-audit.mjs",
     "build:site": "vite build --config site/vite.config.js && node scripts/build-site.mjs",
     "build": "cargo build --release && npm run build:site && node scripts/copy-binary.mjs"
   },

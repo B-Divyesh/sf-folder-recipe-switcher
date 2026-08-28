@@ -71,7 +71,7 @@ async function startVersionedSite() {
   };
 }
 
-test('sample manifest works with keyboard and has no serious accessibility issues', async ({ page }) => {
+test('sample manifest works with keyboard and has no accessibility violations', async ({ page }) => {
   const errors = [];
   page.on('console', (message) => {
     if (message.type() === 'error') errors.push(message.text());
@@ -83,21 +83,31 @@ test('sample manifest works with keyboard and has no serious accessibility issue
   await expect(page.getByRole('heading', { name: 'August portraits' })).toBeVisible();
   await expect(page.getByText('Portrait neutral v3').last()).toBeVisible();
 
-  const scan = await new AxeBuilder({ page }).analyze();
-  const serious = scan.violations.filter(({ impact }) => impact === 'serious' || impact === 'critical');
-  expect(serious).toEqual([]);
+  for (const route of ['/', '/demo/']) {
+    await page.goto(route);
+    const scan = await new AxeBuilder({ page }).analyze();
+    expect(scan.violations).toEqual([]);
+  }
   expect(errors).toEqual([]);
 });
 
-test('invalid recipe files produce an actionable error', async ({ page }) => {
+test('recipe file actions keep an actionable visible focus and recovery state', async ({ page }) => {
   await page.goto('/#inspect');
+  await page.locator('body').press('Control+Home');
+  for (let attempt = 0; attempt < 16; attempt += 1) {
+    await page.keyboard.press('Tab');
+    if (await page.evaluate(() => document.activeElement?.id === 'manifest-file')) break;
+  }
+  await expect(page.locator('#manifest-file')).toBeFocused();
+  await expect(page.locator('.file-picker')).toHaveCSS('outline-width', '3px');
+  await expect(page.locator('.file-picker')).toHaveCSS('outline-color', 'rgb(255, 180, 84)');
   await page.locator('#manifest-file').setInputFiles({
     name: '.photo-recipe.json',
     mimeType: 'application/json',
     buffer: Buffer.from('{"schema_version":2}'),
   });
   await expect(page.getByRole('heading', { name: 'Check this recipe file' })).toBeVisible();
-  await expect(page.getByText(/Schema version 2 is not supported/)).toBeVisible();
+  await expect(page.getByText('This recipe file uses version 2. Choose a version 1 recipe file.')).toBeVisible();
 });
 
 test('legal pages and offline shell remain reachable', async ({ page, context }) => {
@@ -129,13 +139,28 @@ test('first screen explains the job and demo route restores focus after Back', a
   await expect(page).toHaveTitle('Demo — Folder Recipe');
   await expect(page.locator('h1')).toBeFocused();
   await expect(page.getByText('Demo — sample data, nothing is saved')).toBeVisible();
+  if (testInfo.project.name === 'mobile-390') {
+    for (const text of ['August portraits', 'RawTherapee', 'Portrait neutral v3', 'Protect warm skin tones', 'Sample ready · 2 folders · 2 profiles']) {
+      const box = await page.getByText(text, { exact: true }).first().boundingBox();
+      expect(box?.y + box?.height).toBeLessThanOrEqual(844);
+    }
+  }
   await page.goBack();
   await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole('heading', { name: 'Save photo editor profiles beside folders' })).toBeFocused();
   await expect(page.locator('#route-announcer')).not.toBeEmpty();
 });
 
-test('route metadata, shared shell, and designed 404 are present', async ({ page }) => {
+test('route metadata, shared shell, and designed 404 are present in HTTP responses', async ({ page }) => {
+  const demoResponse = await page.request.get('/demo/');
+  expect(demoResponse.ok()).toBeTruthy();
+  const demoSource = await demoResponse.text();
+  expect(demoSource).toContain('<meta name="description" content="Try Folder Recipe with an isolated sample shoot and saved editor profiles."');
+  expect(demoSource).toContain('<meta property="og:title" content="Demo — Folder Recipe"');
+  expect(demoSource).toContain('<meta property="og:description" content="Try Folder Recipe with an isolated sample shoot and saved editor profiles."');
+  expect(demoSource).toContain('<meta property="og:url" content="https://folder-recipe-switcher.sociobot.in/demo/"');
+  expect(demoSource).toContain('<meta name="twitter:title" content="Demo — Folder Recipe"');
+  expect(demoSource).toContain('<meta name="twitter:description" content="Try Folder Recipe with an isolated sample shoot and saved editor profiles."');
   for (const [path, title] of [['/demo/', 'Demo — Folder Recipe'], ['/privacy/', 'Privacy — Folder Recipe'], ['/terms/', 'Terms — Folder Recipe']]) {
     await page.goto(path);
     await expect(page).toHaveTitle(title);
@@ -146,6 +171,17 @@ test('route metadata, shared shell, and designed 404 are present', async ({ page
   await page.goto('/404.html');
   await expect(page).toHaveTitle('Page not found — Folder Recipe');
   await expect(page.getByRole('heading', { name: 'This page has no recipe' })).toBeVisible();
+});
+
+test('mobile header and footer navigation targets are at least 44 pixels', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile-390', 'Touch-target dimensions are checked at the phone viewport.');
+  await page.goto('/');
+  for (const locator of await page.locator('.site-header nav a, .site-footer nav a').all()) {
+    if (!await locator.isVisible()) continue;
+    const box = await locator.boundingBox();
+    expect(box?.width ?? 0).toBeGreaterThanOrEqual(44);
+    expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+  }
 });
 
 test('static routes restore heading focus and announcement after Back', async ({ page }) => {

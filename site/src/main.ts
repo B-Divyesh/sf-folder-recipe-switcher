@@ -1,4 +1,5 @@
 import './style.css';
+import { copy } from './copy.mjs';
 
 type Manifest = {
   schema_version: number;
@@ -41,14 +42,14 @@ function escapeHtml(value: string): string {
 }
 
 export function validateManifest(value: unknown): Manifest {
-  if (!value || typeof value !== 'object') throw new Error('This file is not a JSON object.');
+  if (!value || typeof value !== 'object') throw new Error(copy.notJson);
   const manifest = value as Partial<Manifest>;
-  if (manifest.schema_version !== 1) throw new Error(`Schema version ${String(manifest.schema_version)} is not supported. Use version 1.`);
-  if (typeof manifest.name !== 'string' || !manifest.name.trim()) throw new Error('The recipe file needs a non-empty “name”.');
-  if (typeof manifest.recommended_editor !== 'string' || !manifest.recommended_editor.trim()) throw new Error('The recipe file needs a “recommended_editor”.');
-  if (!manifest.editor_mappings || typeof manifest.editor_mappings !== 'object') throw new Error('The recipe file needs a saved editor profile in “editor_mappings”.');
+  if (manifest.schema_version !== 1) throw new Error(copy.versionError(String(manifest.schema_version)));
+  if (typeof manifest.name !== 'string' || !manifest.name.trim()) throw new Error(copy.missingName);
+  if (typeof manifest.recommended_editor !== 'string' || !manifest.recommended_editor.trim()) throw new Error(copy.missingEditor);
+  if (!manifest.editor_mappings || typeof manifest.editor_mappings !== 'object') throw new Error(copy.missingMappings);
   const profile = manifest.editor_mappings[manifest.recommended_editor];
-  if (typeof profile !== 'string' || !profile.trim()) throw new Error(`There is no saved profile for “${manifest.recommended_editor}”.`);
+  if (typeof profile !== 'string' || !profile.trim()) throw new Error(copy.missingProfile(manifest.recommended_editor));
   return manifest as Manifest;
 }
 
@@ -63,28 +64,28 @@ function renderManifest(manifest: Manifest): void {
   ];
   output.className = 'recipe-output is-ready';
   output.innerHTML = `
-    <p class="output-kicker"><span aria-hidden="true">●</span> Valid schema v1</p>
+    <p class="output-kicker"><span aria-hidden="true">●</span> ${copy.validRecipe}</p>
     <h3>${escapeHtml(manifest.name)}</h3>
     <p class="recommended">Apply <strong>${escapeHtml(manifest.recommended_editor)}</strong> → <strong>${escapeHtml(manifest.editor_mappings[manifest.recommended_editor])}</strong></p>
-    <dl><div><dt>Why</dt><dd>${escapeHtml(manifest.note ?? 'No folder note recorded')}</dd></div><div><dt>Camera, source, and file types</dt><dd>${folderDetails.length ? folderDetails.map(escapeHtml).join(' · ') : 'No camera, source, or file types recorded'}</dd></div></dl>
+    <dl><div><dt>Why</dt><dd>${escapeHtml(manifest.note ?? copy.noFolderNote)}</dd></div><div><dt>Camera, source, and file types</dt><dd>${folderDetails.length ? folderDetails.map(escapeHtml).join(' · ') : copy.noSignals}</dd></div></dl>
     <h4>Saved editor profiles</h4><ul class="mapping-list">${mappings}</ul>`;
 }
 
 function renderError(message: string): void {
   output.className = 'recipe-output is-error';
-  output.innerHTML = `<p class="output-kicker">Could not read recipe file</p><h3>Check this recipe file</h3><p>${escapeHtml(message)}</p><p>Choose a version 1 recipe file or run <code>folder-recipe inspect --json</code> to diagnose it.</p>`;
+  output.innerHTML = `<p class="output-kicker">${copy.unreadable}</p><h3>${copy.checkRecipe}</h3><p>${escapeHtml(message)}</p><p>${copy.recovery.replace('folder-recipe inspect --json', '<code>folder-recipe inspect --json</code>')}</p>`;
 }
 
 async function readFile(file?: File): Promise<void> {
   if (!file) return;
   if (file.size > 1_000_000) {
-    renderError('The file is larger than 1 MB, which is unusually large for a folder recipe.');
+    renderError(copy.tooLarge);
     return;
   }
   try {
     renderManifest(validateManifest(JSON.parse(await file.text())));
   } catch (error) {
-    renderError(error instanceof Error ? error.message : 'The file could not be parsed.');
+    renderError(error instanceof Error ? error.message : copy.unparsed);
   }
 }
 
@@ -93,7 +94,7 @@ sampleButton.addEventListener('click', () => renderManifest(sample));
 resetDemoButton.addEventListener('click', () => {
   fileInput.value = '';
   renderManifest(sample);
-  routeAnnouncer.textContent = 'Demo reset to the bundled portrait sample.';
+  routeAnnouncer.textContent = copy.reset;
 });
 for (const eventName of ['dragenter', 'dragover']) {
   dropZone.addEventListener(eventName, (event) => { event.preventDefault(); dropZone.classList.add('is-dragging'); });
@@ -107,11 +108,11 @@ document.querySelector<HTMLButtonElement>('[data-copy]')?.addEventListener('clic
   const button = event.currentTarget as HTMLButtonElement;
   try {
     await navigator.clipboard.writeText(button.dataset.copy ?? '');
-    button.textContent = 'Copied';
+    button.textContent = copy.copied;
   } catch {
-    button.textContent = 'Select the command above to copy';
+    button.textContent = copy.copyFallback;
   }
-  window.setTimeout(() => { button.textContent = 'Copy install command'; }, 1800);
+  window.setTimeout(() => { button.textContent = copy.copyAction; }, 1800);
 });
 
 function updateNetworkState(online = navigator.onLine): void {
@@ -129,14 +130,24 @@ if (demoMode) {
   demoBanner.hidden = false;
   document.querySelectorAll<HTMLElement>('[data-demo-only]').forEach((element) => { element.hidden = false; });
   renderManifest(sample);
+  const demoDescription = 'Try Folder Recipe with an isolated sample shoot and saved editor profiles.';
+  const demoUrl = 'https://folder-recipe-switcher.sociobot.in/demo/';
   document.title = 'Demo — Folder Recipe';
   const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-  if (canonical) canonical.href = 'https://folder-recipe-switcher.sociobot.in/demo/';
+  if (canonical) canonical.href = demoUrl;
+  document.querySelector<HTMLMetaElement>('meta[name="description"]')?.setAttribute('content', demoDescription);
+  for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) {
+    document.querySelector<HTMLMetaElement>(selector)?.setAttribute('content', 'Demo — Folder Recipe');
+  }
+  for (const selector of ['meta[property="og:description"]', 'meta[name="twitter:description"]']) {
+    document.querySelector<HTMLMetaElement>(selector)?.setAttribute('content', demoDescription);
+  }
+  document.querySelector<HTMLMetaElement>('meta[property="og:url"]')?.setAttribute('content', demoUrl);
   const title = document.querySelector<HTMLElement>('#hero-title')!;
   title.textContent = 'Check saved profiles in a sample shoot';
   window.requestAnimationFrame(() => {
     title.focus();
-    routeAnnouncer.textContent = 'Demo loaded. Sample recipe profiles are ready.';
+    routeAnnouncer.textContent = copy.loaded;
   });
 } else {
   let cameFromThisSite = false;

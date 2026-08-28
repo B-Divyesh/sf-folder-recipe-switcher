@@ -1,6 +1,6 @@
 # Folder Recipe
 
-Folder Recipe is a local CLI for photographers who use several editors. It writes a recipe file beside each photo folder.
+Folder Recipe is a local command-line tool for photographers who use several editors. It writes a recipe file beside each photo folder.
 
 The recipe file is named `.photo-recipe.json`. It stores named editor profiles in readable, versioned JSON.
 
@@ -12,9 +12,9 @@ cargo run -q -p folder-recipe -- demo
 
 The command creates an isolated temporary archive. It inspects an inherited recipe and exports a two-folder import checklist.
 
-Each run uses a new folder and prints its path. Delete that folder to reset the CLI demo.
+Each run uses a new folder and prints its path. Delete that folder to reset the demo.
 
-The browser demo is at <https://folder-recipe-switcher.sociobot.in/?demo=1>. Its sample stays in memory and never touches selected files.
+The browser demo is at <https://folder-recipe-switcher.sociobot.in/demo/>. Its sample stays in memory and never touches selected files.
 
 ## Install
 
@@ -24,7 +24,7 @@ Build the single binary from source:
 cargo install --path cli
 ```
 
-Folder Recipe starts at version `0.1.0` and installs the `folder-recipe` binary.
+This installs `folder-recipe` version `0.1.0`.
 
 ## Save editor profiles
 
@@ -39,7 +39,7 @@ folder-recipe init ./2026-08-portraits \
   --note "Protect warm skin tones"
 ```
 
-Each editor profile is explicit. The command also records observed file extensions and your supplied camera or source notes.
+Each editor profile is explicit. The command also records file types and your supplied camera or source notes.
 
 ## Check a photo folder
 
@@ -78,7 +78,7 @@ npm run build
 cargo package --manifest-path cli/Cargo.toml
 ```
 
-`npm test` runs Rust, site, claim, browser, mobile, offline, privacy, and accessibility checks.
+Run all checks with `npm test`.
 
 `npm run build` creates `dist/bin/folder-recipe` and the deployable website in `dist/site`.
 
@@ -86,9 +86,9 @@ Do not publish from this repository. The factory owns publishing credentials.
 
 ## Privacy and limits
 
-The CLI has no telemetry or network code. It works while network system calls are denied.
+The command-line tool has no telemetry or network code. It works while network system calls are denied.
 
-Folder Recipe changes only the recipe file or checklist path you request. Tests hash photos and sidecars before and after every operation.
+Folder Recipe changes only the recipe file or checklist path you request. Tests hash sample photos and sidecars around init, inspect, and checklist.
 
 The browser checker requests only this site. It does not store selected recipe files in cookies, browser storage, IndexedDB, or OPFS.
 

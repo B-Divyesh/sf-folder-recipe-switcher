@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
 import { mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { extname, join, resolve } from 'node:path';
+import { dirname, extname, join, resolve } from 'node:path';
 import { promisify } from 'node:util';
 import { after, before, test } from 'node:test';
 import { chromium } from 'playwright';
@@ -52,23 +52,32 @@ async function temp() { return mkdtemp(join(tmpdir(), 'folder-recipe-claim-')); 
 async function run(args, options = {}) { return execFile(binary, args, { timeout: 8_000, ...options }); }
 async function digest(path) { return createHash('sha256').update(await readFile(path)).digest('hex'); }
 async function init(folder, name, profile = 'Portrait neutral v3') {
-  return run(['init', folder, '--name', name, '--map', `rawtherapee=${profile}`, '--map', 'darktable=Portrait neutral', '--recommend', 'rawtherapee', '--note', 'Protect warm skin tones']);
+  return run(['init', folder, '--name', name, '--map', `rawtherapee=${profile}`, '--map', 'darktable=Portrait neutral', '--recommend', 'rawtherapee', '--camera', 'Fujifilm X-T5', '--source', 'camera-raw', '--note', 'Protect warm skin tones']);
 }
 
 test('@claim:demo-isolated creates a disposable complete sample', async () => {
   const base = await temp();
   try {
-    const first = join(base, 'one');
-    const second = join(base, 'two');
-    const a = await run(['demo', '--output', first]);
-    const b = await run(['demo', '--output', second]);
+    const tempParent = join(base, 'demo-parent');
+    await mkdir(tempParent);
+    const environment = { ...process.env, TMPDIR: tempParent };
+    const a = await run(['demo'], { env: environment });
+    const b = await run(['demo'], { env: environment });
+    const first = a.stdout.match(/^Demo folder: (.+)$/m)?.[1];
+    const second = b.stdout.match(/^Demo folder: (.+)$/m)?.[1];
+    assert.ok(first, 'the bare demo prints its folder');
+    assert.ok(second, 'the second bare demo prints its folder');
+    assert.equal(dirname(first), tempParent);
+    assert.equal(dirname(second), tempParent);
     assert.match(a.stdout, /Nothing here reads or writes your real photo folders/);
     assert.match(a.stdout, /Wrote 2 folder recipe\(s\)/);
     assert.notEqual(first, second);
     assert.equal((await stat(join(first, 'import-checklist.md'))).isFile(), true);
     assert.equal((await stat(join(first, '2026-08-portraits', '.photo-recipe.json'))).isFile(), true);
+    const inspection = JSON.parse((await run(['inspect', join(first, '2026-08-portraits', 'selects'), '--json'])).stdout);
+    assert.equal(inspection.inherited, true);
+    assert.equal(inspection.recipe.name, 'August window-light portraits');
     assert.match(b.stdout, new RegExp(second.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-    await assert.rejects(run(['demo', '--output', first]), (error) => error.code === 2);
   } finally { await rm(base, { recursive: true, force: true }); }
 });
 
@@ -84,13 +93,15 @@ test('@claim:recipe-write writes readable versioned mappings and folder signals'
     assert.equal(recipe.schema_version, 1);
     assert.deepEqual(recipe.editor_mappings, { darktable: 'Portrait neutral', rawtherapee: 'Portrait neutral v3' });
     assert.deepEqual(recipe.heuristics.extensions, ['raf']);
+    assert.deepEqual(recipe.heuristics.camera_models, ['Fujifilm X-T5']);
+    assert.deepEqual(recipe.heuristics.sources, ['camera-raw']);
     assert.equal(recipe.note, 'Protect warm skin tones');
-    await run(['init', shoot, '--name', 'August portraits', '--map', 'darktable=Portrait neutral', '--map', 'rawtherapee=Portrait neutral v3', '--recommend', 'rawtherapee', '--note', 'Protect warm skin tones', '--force']);
+    await run(['init', shoot, '--name', 'August portraits', '--map', 'darktable=Portrait neutral', '--map', 'rawtherapee=Portrait neutral v3', '--recommend', 'rawtherapee', '--camera', 'Fujifilm X-T5', '--source', 'camera-raw', '--note', 'Protect warm skin tones', '--force']);
     assert.equal(await readFile(path, 'utf8'), first);
   } finally { await rm(base, { recursive: true, force: true }); }
 });
 
-test('@claim:originals-unchanged preserves photos and sidecars through every operation', async () => {
+test('@claim:originals-unchanged preserves photos and sidecars around init, inspect, and checklist', async () => {
   const base = await temp();
   try {
     const demo = join(base, 'demo'); await run(['demo', '--output', demo]);
@@ -167,6 +178,19 @@ test('@claim:cli-offline completes with network syscalls denied', async () => {
   } finally { await rm(base, { recursive: true, force: true }); }
 });
 
+test('@claim:install-version installs the documented release version into a fresh prefix', async () => {
+  const base = await temp();
+  try {
+    const prefix = join(base, 'prefix');
+    const install = spawnSync('cargo', ['install', '--path', resolve(root, 'cli'), '--root', prefix, '--force'], { cwd: root, encoding: 'utf8', timeout: 60_000 });
+    assert.equal(install.status, 0, install.stderr);
+    const installed = join(prefix, 'bin', `folder-recipe${process.platform === 'win32' ? '.exe' : ''}`);
+    assert.equal((await stat(installed)).isFile(), true);
+    const version = await execFile(installed, ['--version']);
+    assert.equal(version.stdout.trim(), 'folder-recipe 0.1.0');
+  } finally { await rm(base, { recursive: true, force: true }); }
+});
+
 test('@claim:build-outputs produces the release binary and deployable site', async () => {
   const base = await temp();
   try { await run(['demo', '--output', join(base, 'demo')]); } finally { await rm(base, { recursive: true, force: true }); }
@@ -187,14 +211,34 @@ test('@claim:web-demo-isolated opens in one click, resets, and offers a real sta
   const context = await browser.newContext(); const page = await context.newPage();
   try {
     await page.goto(origin); await page.getByRole('link', { name: 'Try it with sample data' }).click();
-    assert.equal(new URL(page.url()).searchParams.get('demo'), '1');
+    assert.equal(new URL(page.url()).pathname, '/demo/');
     await page.getByText('Demo — sample data, nothing is saved').waitFor();
     assert.equal(await page.locator('#recipe-output h3').textContent(), 'August portraits');
     assert.equal(await page.locator('#recipe-output .mapping-list li').count(), 2);
+    await page.locator('#manifest-file').setInputFiles({ name: '.photo-recipe.json', mimeType: 'application/json', buffer: Buffer.from('{"schema_version":1,"name":"Private fixture","recommended_editor":"darktable","editor_mappings":{"darktable":"Neutral"}}') });
+    assert.equal(await page.locator('#recipe-output h3').textContent(), 'Private fixture');
     await page.getByRole('button', { name: 'Reset demo' }).click();
     assert.equal(await page.locator('#recipe-output h3').textContent(), 'August portraits');
-    assert.equal(await page.getByRole('link', { name: 'Start for real' }).getAttribute('href'), '/');
-    assert.deepEqual(await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length })), { local: 0, session: 0 });
+    assert.equal(await page.locator('#recipe-output .mapping-list li').count(), 2);
+    await page.getByRole('link', { name: 'Start for real' }).click();
+    assert.equal(new URL(page.url()).pathname, '/');
+    assert.equal(await page.locator('#demo-banner').isHidden(), true);
+    assert.equal(await page.locator('#recipe-output h3').textContent(), 'Your checked recipe appears here');
+    assert.deepEqual(await page.evaluate(async () => ({
+      local: localStorage.length,
+      session: sessionStorage.length,
+      cookies: document.cookie,
+      databases: indexedDB.databases ? (await indexedDB.databases()).length : 0,
+      opfs: await (async () => {
+        if (!navigator.storage?.getDirectory) return 0;
+        let count = 0; for await (const _entry of (await navigator.storage.getDirectory()).values()) count += 1;
+        return count;
+      })(),
+    })), { local: 0, session: 0, cookies: '', databases: 0, opfs: 0 });
+    await page.goto(`${origin}/?demo=1`);
+    assert.equal(await page.title(), 'Demo — Folder Recipe');
+    assert.equal(await page.locator('#demo-banner').isVisible(), true);
+    assert.equal(await page.locator('#recipe-output h3').textContent(), 'August portraits');
   } finally { await context.close(); }
 });
 
@@ -202,7 +246,7 @@ test('@claim:browser-private keeps selected recipes in memory and requests only 
   const context = await browser.newContext(); const page = await context.newPage(); const requests = [];
   page.on('request', (request) => requests.push(request.url()));
   try {
-    await page.goto(`${origin}/?demo=1`);
+    await page.goto(`${origin}/demo/`);
     await page.locator('#manifest-file').setInputFiles({ name: '.photo-recipe.json', mimeType: 'application/json', buffer: Buffer.from('{"schema_version":1,"name":"Private","recommended_editor":"darktable","editor_mappings":{"darktable":"Neutral"},"created_with":"fixture"}') });
     await page.getByRole('heading', { name: 'Private' }).waitFor();
     assert.equal(requests.every((url) => new URL(url).origin === origin), true);
@@ -224,7 +268,7 @@ test('@claim:browser-private keeps selected recipes in memory and requests only 
 test('@claim:offline-demo reloads and resets the sample without a connection', async () => {
   const context = await browser.newContext(); const page = await context.newPage();
   try {
-    await page.goto(`${origin}/?demo=1`); await page.waitForFunction(() => navigator.serviceWorker?.controller !== null); await context.setOffline(true); await page.reload();
+    await page.goto(`${origin}/demo/`); await page.waitForFunction(() => navigator.serviceWorker?.controller !== null); await context.setOffline(true); await page.reload();
     await page.getByRole('heading', { name: 'Check saved profiles in a sample shoot' }).waitFor();
     await page.getByRole('button', { name: 'Reset demo' }).click(); await page.getByRole('heading', { name: 'August portraits' }).waitFor();
   } finally { await context.setOffline(false); await context.close(); }

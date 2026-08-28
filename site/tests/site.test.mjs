@@ -5,7 +5,7 @@ import { promisify } from 'node:util';
 import { test } from 'node:test';
 
 const root = new URL('../', import.meta.url);
-const builtSite = new URL('../../dist/site/', import.meta.url);
+const builtSite = new URL('../dist/site/', root);
 const run = promisify(execFile);
 
 test('landing page has required semantic structure', async () => {
@@ -33,6 +33,29 @@ test('reduced motion and focus treatment are explicit', async () => {
   const css = await readFile(new URL('src/style.css', root), 'utf8');
   assert.match(css, /prefers-reduced-motion:\s*reduce/);
   assert.match(css, /:focus-visible/);
+  assert.match(css, /\.file-picker:focus-within/);
+  assert.match(css, /min-width:\s*44px/);
+});
+
+test('claim ledger has one executable tagged test for every retained claim', async () => {
+  const [ledger, claimTests] = await Promise.all([
+    readFile(new URL('../.factory/claims.json', root), 'utf8'),
+    readFile(new URL('tests/claims.test.mjs', root), 'utf8'),
+  ]);
+  const claims = JSON.parse(ledger);
+  assert.equal(new Set(claims.map(({ id }) => id)).size, claims.length);
+  for (const claim of claims) {
+    assert.match(claim.test, new RegExp(`^npm run test:claims -- --grep @claim:${claim.id}$`));
+    assert.equal((claimTests.match(new RegExp(`@claim:${claim.id}\\b`, 'g')) ?? []).length, 1, `${claim.id} needs exactly one tagged regression`);
+  }
+});
+
+test('copy audit is generated from current copy and has no unresolved flags', async () => {
+  await run('node', ['scripts/generate-copy-audit.mjs', '--check'], { cwd: process.cwd() });
+  const audit = await readFile(new URL('../.factory/copy-audit.md', root), 'utf8');
+  assert.match(audit, /Counts use one whitespace-delimited `wordCount` function/);
+  assert.match(audit, /No sentence exceeds 22 words and no banned word appears\./);
+  assert.match(audit, /\| File formats found \| file types \| `extensions` \|/);
 });
 
 test('route scripts restore heading focus and announce browser history navigation', async () => {
@@ -73,6 +96,21 @@ test('built site versions its service worker and declares immutable asset cachin
   assert.match(config.globalHeaders['Permissions-Policy'], /camera=\(\)/);
   assert.deepEqual(config.responseOverrides['404'], { rewrite: '/404.html', statusCode: 404 });
   assert.equal(config.routes.find(({ route }) => route === '/assets/*').headers['Cache-Control'], 'public, max-age=31536000, immutable');
+});
+
+test('the generated demo response has its own complete source metadata', async () => {
+  const demo = await readFile(new URL('demo/index.html', builtSite), 'utf8');
+  for (const expected of [
+    '<title>Demo — Folder Recipe</title>',
+    '<meta name="description" content="Try Folder Recipe with an isolated sample shoot and saved editor profiles."',
+    '<link rel="canonical" href="https://folder-recipe-switcher.sociobot.in/demo/"',
+    '<meta property="og:title" content="Demo — Folder Recipe"',
+    '<meta property="og:description" content="Try Folder Recipe with an isolated sample shoot and saved editor profiles."',
+    '<meta property="og:url" content="https://folder-recipe-switcher.sociobot.in/demo/"',
+    '<meta name="twitter:title" content="Demo — Folder Recipe"',
+    '<meta name="twitter:description" content="Try Folder Recipe with an isolated sample shoot and saved editor profiles."',
+  ]) assert.match(demo, new RegExp(expected.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.doesNotMatch(demo, /Save editor profiles beside photo folders, check inherited recipe files/);
 });
 
 test('a shell change produces a different service-worker revision', async () => {

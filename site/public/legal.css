@@ -8,7 +8,7 @@ a { color: #ffb454; }
 .site-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px clamp(20px, 6vw, 96px); border-bottom: 1px solid #41505b; }
 .brand { display: inline-flex; min-height: 44px; align-items: center; gap: 12px; color: #f2efe6; font-weight: 700; text-decoration: none; }
 .site-header nav, .site-footer nav { display: flex; gap: 24px; }
-.site-header nav a, .site-footer nav a { display: inline-flex; min-height: 44px; align-items: center; color: #b9c3c9; font-size: 14px; }
+.site-header nav a, .site-footer nav a { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; padding-inline: 8px; color: #b9c3c9; font-size: 14px; }
 main { width: min(760px, calc(100% - 40px)); min-height: 66vh; margin-inline: auto; padding: 80px 0 112px; }
 h1 { max-width: 14ch; margin: 0 0 32px; font: 400 clamp(42px, 8vw, 68px)/1 Georgia, serif; letter-spacing: -.04em; }
 h2 { margin-top: 48px; font: 400 28px/1.2 Georgia, serif; }
