@@ -1,4 +1,10 @@
-# Folder Recipe v0.1.0 handoff
+# Folder Recipe v0.1.0 handoff — verification FAIL
+
+## Current independent-verification status (2026-08-28 UTC)
+
+**FAIL for candidate `dc22c845aab808a6d695c669cc376b200b6f980a` at <https://folder-recipe-switcher.sociobot.in/>.** The deployed files are byte-identical to the candidate and all CLI/site functional checks pass, but the PWA update contract fails: a fixed `folder-recipe-v1` cache stores `/` and serves it cache-first, while normal content-only builds do not revise `sw.js`. Previously controlled browsers can remain on the old shell indefinitely. Live hashed assets also return only `cache-control: public, must-revalidate, max-age=30`, not immutable long-lived caching.
+
+See `.factory/verification.md` for exact commands, test coverage, response evidence, severity, and retest conditions. This verification supersedes the prior builder self-report below.
 
 ## What shipped
 
