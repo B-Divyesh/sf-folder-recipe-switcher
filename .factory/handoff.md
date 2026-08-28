@@ -1,74 +1,29 @@
-# Folder Recipe review-1 handoff — FAIL
+# Folder Recipe polish-1 handoff — PASS
 
-**Work order:** `folder-recipe-switcher-review-1`
-**Reviewed:** 2026-08-28 UTC
-**Scope:** adversarial first-read review only; no product code was changed.
+**Work order:** `folder-recipe-switcher-polish-1`
 
-## Current review result
+**Base review:** `038e769d06bdea6953996d9307f79741d9f75fd1`
 
-This review **FAILS**. The full report is `.factory/review-1.md` (38 findings).
-Blocking issues are: the first screen does not state the job, audience, and
-safe first action; there is no isolated sample demo; and the required
-`.factory/claims.json` plus `@claim:` test coverage is absent.
+**Deployed product commit:** `a3c7877e15aaf2a86e26410768df07ca52f63ef5`
 
-## What this review did
+**Live URL:** <https://folder-recipe-switcher.sociobot.in/>
+**Deployment ID:** `08844f80-9773-4bfe-a108-9dc14759d7bc`
 
-- Cold-tested the live landing in fresh 390 px and desktop contexts.
-- Read the brief, design thesis, previous handoff, and verification history;
-  no prior `review-*` or `polish-*` file exists.
-- Recorded every landing/README prose sentence and word count in the review.
-- Checked demo routes/CLI: `/demo` is landing fallback and
-  `folder-recipe demo` exits 2; no `examples/` or `.factory/demo.md` exists.
-- Clean-cloned into `/tmp/folder-recipe-clean.DoHgcY`; `npm ci`, `npm test`,
-  and `npm run build` completed successfully.
-- Crawled live homepage/legal/GitHub links and checked route, metadata,
-  skeleton, and response headers.
+## What changed
 
-## Reproduce
+- Rewrote the first screen around the photographer’s job and made the isolated sample the primary action.
+- Added `folder-recipe demo`, realistic bundled sample folders, fresh temporary output, a two-folder checklist, and reset instructions.
+- Added equivalent `?demo=1` and `/demo` browser entry points with an in-memory sample, persistent banner, Reset, and Start-for-real controls.
+- Added `.factory/claims.json` and 13 uniquely tagged observable claim tests.
+- Rewrote headings, buttons, errors, README, privacy, terms, and the catalog description in consistent plain words.
+- Added route-specific titles, canonicals, OG/Twitter metadata, social artwork, apple icon, focus announcements, and a designed 404.
+- Added the shared header/footer skeleton to landing, demo, legal, and 404 pages.
+- Added CSP, Permissions-Policy, clickjacking protection, and explicit route/cache behavior.
+- Preserved the blue-hour archive-room art direction and added only derived, product-specific assets with provenance.
 
-```sh
-npm ci
-npm test
-npm run build
-cargo run -q -p folder-recipe -- demo
-```
+Every review finding maps to a repair and evidence in `.factory/polish-1.md`.
 
-The final command reproduces the missing-demo finding. Do not close this review
-until every current finding in `.factory/review-1.md` is repaired and the full
-checklist is rerun against live deployment.
-
----
-
-# Historical verification handoff — PASS
-
-**Independent verifier result:** **PASS** for candidate
-`f0404f707c0788e7162bd661717277d47b03971e` at
-<https://folder-recipe-switcher.sociobot.in/> (2026-08-28 UTC).
-
-The fresh verification is recorded in `.factory/verification-2.md`; the prior
-failure is retained in `.factory/verification.md` as historical evidence. No
-product code was changed during verification.
-
-## What was verified
-
-- Clean install, Rust formatting/Clippy, the complete test suite, exact
-  production build, and `cargo package` all pass.
-- A clean package consumer successfully installs and runs the public CLI.
-- A mixed archive exercise verifies explicit per-editor mappings, inherited
-  recipes, empty-folder and mixed-extension feedback, deterministic checklist
-  export, safe error exit codes, and byte-preservation of originals.
-- The live HTML, CSS, JS, service worker, and hero asset are SHA-256 identical
-  to the freshly built candidate.
-- Live desktop and 390 px browser checks pass keyboard/focus, recovery,
-  reduced-motion, offline reload, Axe serious/critical, console, privacy, and
-  first-party-request checks.
-- Mobile Lighthouse is 99 performance / 100 accessibility / 100 best
-  practices / 100 SEO (LCP 1.1 s, CLS 0, TBT 110 ms). Asset budgets and
-  immutable hashed-asset caching pass.
-- The versioned service-worker controlled-client update regression passes on
-  both desktop and 390 px projects.
-
-## Build and verify
+## How to verify
 
 ```sh
 npm ci
@@ -79,17 +34,48 @@ npm run build
 cargo package --manifest-path cli/Cargo.toml
 ```
 
-Deploy `dist/site`; do not publish the Cargo package from this repository.
-The factory owns registry credentials.
+Run one claim exactly as the verifier will:
 
-## Known gaps / next steps
+```sh
+npm run test:claims -- --grep @claim:offline-demo
+```
 
-- Camera/source signals remain explicit rather than EXIF-derived; any future
-  detector must stay read-only and preserve schema v1 compatibility.
-- No editor adapter applies a recipe automatically; the tool intentionally
-  records and verifies intent without changing RAW pixels, sidecars, or
-  catalogues.
-- Cross-platform signed prebuilt binaries remain a release-pipeline task.
-- Optional header hardening: add CSP, Permissions-Policy, and clickjacking
-  protection at deployment. This was observed but is not a release blocker for
-  the local, no-account static product.
+Run the bundled CLI demo:
+
+```sh
+dist/bin/folder-recipe demo
+```
+
+## Verification completed
+
+- Fresh clone `/tmp/folder-recipe-clean.ULTSLy` at `71ef63e26e33605bd9067db77b6d66ae59aefc9c`: `npm ci` passed with zero vulnerabilities.
+- All 13 claim commands from `.factory/claims.json` ran separately and passed.
+- Formatting, strict Clippy, the full `npm test`, `npm run build`, and `cargo package` passed in that clone.
+- Rust: 4 library tests and 2 CLI integration tests passed.
+- Site: 5 static contract tests and 13 claim tests passed.
+- Browser: 12 Playwright project runs passed across desktop and 390×844 mobile.
+- Accessibility: Axe reported zero serious/critical violations at both sizes; keyboard, focus, skip link, landmarks, and reduced motion passed.
+- Privacy: full demo/file flow made only same-origin requests and left cookies, local/session storage, IndexedDB, and OPFS empty.
+- Offline: a controlled fresh demo reloaded offline and Reset demo restored the sample.
+- Performance: Lighthouse mobile scored 100/100/100/100; LCP 1.01 s, CLS 0, and TBT 0.
+- Budgets: JS 2,410 B gzip; CSS 3,237 B gzip; no fonts; hero 39,312 B; social image 73,266 B.
+- Packaging: `cargo package` produced 8 files, 44.7 KiB unpacked and 12.6 KiB compressed, then verified the crate.
+
+## Live verification
+
+After deployment, a cold browser run at 1440×900 and 390×844 confirmed:
+
+- `/`, `/demo`, `/?demo=1`, `/privacy/`, and `/terms/` return 200.
+- `/not-a-real-page` returns 404 with the designed Folder Recipe page.
+- Demo title, focused h1, banner, ready sample, reset, and offline reload all work.
+- No console errors, serious/critical Axe findings, third-party requests, storage, or horizontal overflow occurred.
+- CSP, Permissions-Policy, `nosniff`, referrer policy, and frame blocking are present.
+- Hashed JS returns one-year immutable caching.
+- Root HTML, JS, hero, service worker, demo, legal, and 404 content match the built artifact byte-for-byte.
+- Every crawled product and GitHub link returned 200.
+
+Evidence is in `.factory/evidence/live/`, `.factory/evidence/local/`, and `.factory/evidence/lighthouse/summary.json`.
+
+## Known gaps
+
+None within the reviewed product scope. Registry publishing and signed cross-platform binaries remain factory release work, not product defects.

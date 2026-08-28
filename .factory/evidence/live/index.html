@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#090e13" />
+    <meta name="description" content="Save editor profiles beside photo folders, check inherited settings, and export an import checklist." />
+    <link rel="canonical" href="https://folder-recipe-switcher.sociobot.in/" />
+    <link rel="icon" href="/folder-mark.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" href="/archive-room.webp" as="image" type="image/webp" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Folder Recipe — Save photo editor profiles" />
+    <meta property="og:description" content="Keep each photo folder’s chosen editor profile in a readable recipe file." />
+    <meta property="og:url" content="https://folder-recipe-switcher.sociobot.in/" />
+    <meta property="og:image" content="https://folder-recipe-switcher.sociobot.in/social-card.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Folder Recipe — Save photo editor profiles" />
+    <meta name="twitter:description" content="Keep each photo folder’s chosen editor profile in a readable recipe file." />
+    <meta name="twitter:image" content="https://folder-recipe-switcher.sociobot.in/social-card.jpg" />
+    <title>Folder Recipe — Save photo editor profiles</title>
+    <script type="module" crossorigin src="/assets/index-DJyAguiX.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CPjRzPdU.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <div class="demo-banner" id="demo-banner" role="status" hidden>
+      <strong>Demo — sample data, nothing is saved</strong>
+      <span class="demo-controls"><button id="reset-demo" type="button">Reset demo</button><a href="/">Start for real</a></span>
+    </div>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Folder Recipe home"><img src="/folder-mark.svg" width="34" height="28" alt="" /><span>Folder Recipe</span></a>
+      <nav aria-label="Primary navigation"><a href="/demo/">Demo</a><a href="/#workflow">How it works</a><a href="/privacy/">Privacy</a></nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <img class="hero-art" src="/archive-room.webp" width="1536" height="1024" alt="A blue-hour photo archive leads toward one amber-marked folder" fetchpriority="high" />
+        <div class="hero-shade"></div>
+        <div class="hero-copy">
+          <p class="eyebrow"><span aria-hidden="true">01</span> Folder-level photo settings</p>
+          <h1 id="hero-title" tabindex="-1">Save photo editor profiles beside folders</h1>
+          <p class="lede">For photographers mixing shoots and editors, keep the chosen profile with each photo folder.</p>
+          <div class="hero-actions"><a class="button primary" href="/?demo=1">Try it with sample data</a><a class="button quiet" href="#install">Install Folder Recipe</a></div>
+          <p class="action-note">Opens a sample shoot and shows its saved editor profiles.</p>
+          <ul class="facts" aria-label="Product facts"><li>Runs on your computer</li><li>Does not change photos</li><li>Free under the MIT License</li></ul>
+        </div>
+        <aside class="manifest-peek" aria-label="Sample saved recipe">
+          <div class="peek-head"><span>portraits/.photo-recipe.json</span><span class="status">direct</span></div>
+          <div class="peek-line"><span>editor</span><strong>RawTherapee</strong></div>
+          <div class="peek-line"><span>profile</span><strong>Portrait neutral v3</strong></div>
+          <div class="peek-line"><span>reason</span><strong>Protect warm skin tones</strong></div>
+          <div class="demo-result" data-demo-only hidden><span>Sample ready</span><strong>2 folders · 2 profiles</strong></div>
+        </aside>
+      </section>
+
+      <section class="promise" aria-label="Recipe file summary"><p>Readable JSON recipe file</p><p>Named editor profiles</p><p>Photos stay unchanged</p></section>
+
+      <section class="section workflow" id="workflow" aria-labelledby="workflow-title">
+        <div class="section-intro"><p class="eyebrow"><span aria-hidden="true">02</span> How it works</p><h2 id="workflow-title">How recipe files work</h2><p>A folder uses its own recipe file or the nearest one above it. Inspect shows the source before you open an editor.</p></div>
+        <ol class="recipe-rail">
+          <li><span class="step">01</span><div><h3>Save profiles</h3><p>Name each editor profile and record why it fits the shoot.</p><code>folder-recipe init ./shoot …</code></div></li>
+          <li><span class="step">02</span><div><h3>Check a folder</h3><p>See the direct or inherited recipe beside file counts and extensions.</p><code>folder-recipe inspect ./shoot/selects</code></div></li>
+          <li><span class="step">03</span><div><h3>Export a checklist</h3><p>Create editor and profile steps for every folder with a recipe file.</p><code>folder-recipe checklist ./archive</code></div></li>
+        </ol>
+      </section>
+
+      <section class="section inspector" id="inspect" aria-labelledby="inspect-title">
+        <div class="section-intro"><p class="eyebrow"><span aria-hidden="true">03</span> Recipe file checker</p><h2 id="inspect-title">Check a photo folder’s recipe</h2><p>Choose a `.photo-recipe.json` file. Your browser checks it without uploading or storing it.</p></div>
+        <div class="light-table">
+          <div class="drop-zone" id="drop-zone"><div class="folder-glyph" aria-hidden="true"><span></span></div><h3>Choose a recipe file</h3><p>Accepts a JSON recipe file.</p><label class="button primary" for="manifest-file">Choose recipe file</label><input id="manifest-file" type="file" accept="application/json,.json" /><button class="text-button" id="load-sample" type="button">Try the sample recipe file</button></div>
+          <div class="recipe-output" id="recipe-output" aria-live="polite"><p class="output-kicker">No recipe file selected</p><h3>Your checked recipe appears here</h3><p>Use the sample to see two editor profiles and the folder note.</p></div>
+        </div>
+      </section>
+
+      <section class="section terminal-demo" aria-labelledby="terminal-demo-title">
+        <div class="section-intro"><p class="eyebrow"><span aria-hidden="true">04</span> Bundled CLI demo</p><h2 id="terminal-demo-title">See the sample workflow</h2><p>This transcript comes from the bundled sample command. It creates a temporary archive and prints its location.</p></div>
+        <figure class="terminal" aria-label="Folder Recipe demo terminal transcript"><div class="terminal-title"><span>terminal recording</span><span>sample archive</span></div><pre><code>$ folder-recipe demo
+Demo — bundled sample data in a new temporary folder
+$ folder-recipe inspect …/2026-08-portraits/selects
+Source: …/.photo-recipe.json (inherited)
+Apply: rawtherapee → Portrait neutral v3
+$ folder-recipe checklist … --output …/import-checklist.md
+Wrote 2 folder recipe(s)</code></pre><figcaption>Run the command again for a clean sample. Delete its printed folder to reset.</figcaption></figure>
+      </section>
+
+      <section class="section install" id="install" aria-labelledby="install-title">
+        <div class="section-intro"><p class="eyebrow"><span aria-hidden="true">05</span> Local installation</p><h2 id="install-title">Install Folder Recipe</h2><p>Build the single Rust binary from source. No account is needed.</p></div>
+        <div class="terminal"><div class="terminal-title"><span>terminal</span><span>folder-recipe 0.1.0</span></div><pre><code>cargo install --git https://github.com/B-Divyesh/sf-folder-recipe-switcher
+
+folder-recipe demo</code></pre><button class="copy-button" type="button" data-copy="cargo install --git https://github.com/B-Divyesh/sf-folder-recipe-switcher">Copy install command</button></div>
+      </section>
+
+      <section class="section limits" aria-labelledby="limits-title"><div class="section-intro"><p class="eyebrow"><span aria-hidden="true">06</span> Scope</p><h2 id="limits-title">What Folder Recipe does not do</h2><p>It does not edit photos, apply profiles, or manage an editor catalogue. It records your choices in files you control.</p></div></section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-product"><img src="/folder-mark.svg" width="28" height="23" alt="" /><span>Folder Recipe saves editor profiles beside photo folders.</span></div>
+      <nav aria-label="Footer navigation"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-folder-recipe-switcher">View source on GitHub (opens GitHub)</a></nav>
+      <p>Built by Param Factory · v0.1.0 · build 5164141-polish1</p>
+    </footer>
+    <div class="offline-note" id="offline-note" role="status" hidden>Offline. The demo and recipe file checker remain available.</div>
+    <div class="route-announcer" id="route-announcer" aria-live="polite" aria-atomic="true"></div>
+  </body>
+</html>

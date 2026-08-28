@@ -1,0 +1,102 @@
+{
+  "origin": "https://folder-recipe-switcher.sociobot.in",
+  "checkedAt": "2026-08-28T11:35:57.413Z",
+  "viewports": {
+    "desktop": {
+      "title": "Demo — Folder Recipe",
+      "h1": "Check saved profiles in a sample shoot",
+      "facts": [
+        {
+          "text": "Runs on your computer",
+          "bottom": 692.09375
+        },
+        {
+          "text": "Does not change photos",
+          "bottom": 692.09375
+        },
+        {
+          "text": "Free under the MIT License",
+          "bottom": 692.09375
+        }
+      ],
+      "focused": true,
+      "seriousAxe": 0,
+      "horizontalOverflow": false,
+      "errors": []
+    },
+    "mobile": {
+      "title": "Demo — Folder Recipe",
+      "h1": "Check saved profiles in a sample shoot",
+      "facts": [
+        {
+          "text": "Runs on your computer",
+          "bottom": 576.140625
+        },
+        {
+          "text": "Does not change photos",
+          "bottom": 604.28125
+        },
+        {
+          "text": "Free under the MIT License",
+          "bottom": 632.421875
+        }
+      ],
+      "focused": true,
+      "seriousAxe": 0,
+      "horizontalOverflow": false,
+      "errors": []
+    }
+  },
+  "routes": {
+    "/demo": {
+      "status": 200,
+      "title": "Demo — Folder Recipe",
+      "h1": "Save photo editor profiles beside folders",
+      "canonical": true,
+      "og": true
+    },
+    "/privacy/": {
+      "status": 200,
+      "title": "Privacy — Folder Recipe",
+      "h1": "Privacy for your photo folders",
+      "canonical": true,
+      "og": true
+    },
+    "/terms/": {
+      "status": 200,
+      "title": "Terms — Folder Recipe",
+      "h1": "Terms for using Folder Recipe",
+      "canonical": true,
+      "og": true
+    },
+    "/not-a-real-page": {
+      "status": 404,
+      "title": "Page not found — Folder Recipe",
+      "h1": "This page has no recipe",
+      "canonical": true,
+      "og": true
+    }
+  },
+  "offline": true,
+  "privacy": {
+    "desktop": {
+      "thirdPartyRequests": [],
+      "storage": {
+        "local": 0,
+        "session": 0,
+        "cookies": "",
+        "indexedDb": 0
+      }
+    },
+    "mobile": {
+      "thirdPartyRequests": [],
+      "storage": {
+        "local": 0,
+        "session": 0,
+        "cookies": "",
+        "indexedDb": 0
+      }
+    }
+  },
+  "errors": []
+}
