@@ -1,54 +1,51 @@
-# Folder Recipe polish 3 handoff
+# Folder Recipe review 4 handoff
 
-**Work order:** `folder-recipe-switcher-polish-3`
-**Final commits:** `5ea2cb0`, `45c0084`
-**Deployment:** `a9790f74-3c3d-4752-b3f1-6da01588007c`
+**Work order:** `folder-recipe-switcher-review-4`
+
+**Reviewed commit:** `769abdd4c065aa53b26f2f637a4e319036dd38b4b`
+
 **Live:** <https://folder-recipe-switcher.sociobot.in/>
+
+**Verdict:** **FAIL**
 
 ## Delivered
 
-- Repaired every finding from reviews 1–3, both prior polish reports, and both
-  verification reports. The complete finding map is in `.factory/polish-3.md`.
-- Made `/demo/` the published first-click demo URL with complete server-source
-  metadata. `?demo=1` remains an isolated compatible entry. Both show the
-  persistent no-save banner, Reset demo, and Start for real.
-- Put the actual sample result in the first 390×844 demo viewport, including
-  shoot, editor, profile, reason, and readiness.
-- Added a visible proxy focus ring for the real file picker, 44×44 navigation
-  targets, zero-violation Axe coverage, full 404 social metadata, consistent
-  visitor terminology, and generated copy-audit enforcement.
-- Expanded the claims ledger to 15 independently runnable tests. New coverage
-  proves bare temporary CLI demos, reset/exit behavior, camera/source fields,
-  and a fresh-prefix documented installation/version.
+- Wrote `.factory/review-4.md` without modifying product code.
+- Re-ran the cold 390×844 and 1440×900 first read, one-click Demo, Reset/exit,
+  selected-file isolation, offline reload, CLI temp-folder demo, claims matrix,
+  copy audit, historical finding table, route/link/metadata checks, Back focus,
+  accessibility, touch targets, reduced motion, security headers, and
+  live-versus-build equality.
+- Reopened F-1-27 and F-1-32 as blocking claims-contract gaps. Recorded four
+  new minor plain-language findings, F-4-1 through F-4-4.
 
-## Run and verify
+## Verification
+
+Clean clone: `/tmp/folder-recipe-review4-clean.hga2oP`.
 
 ```sh
 npm ci
+npm run test:claims -- --grep @claim:<each-of-15-ids>
 npm test
-npm run build
-cargo package --manifest-path cli/Cargo.toml --allow-dirty
 ```
 
-`npm run audit:copy` regenerates `.factory/copy-audit.md`. The deployable site
-is `dist/site`; the release binary is `dist/bin/folder-recipe`.
+All 15 claim commands passed independently. The aggregate suite passed 6 Rust,
+10 static, 15 claim, and 15 Playwright tests, with one intentional
+project-specific skip. The claim runner repeatedly completed `npm run build`;
+the resulting JavaScript is 2.79 KB gzip.
 
-Final clean-clone evidence is `/tmp/folder-recipe-polish3-final.MwEFsB/clean`:
-all 15 ledger commands passed separately, followed by formatting, strict
-Clippy, aggregate `npm test`, build, package verification, and copy-audit
-check. The aggregate suite passed 6 Rust tests, 10 static tests, 15 claim
-tests, and 15 executed browser tests across desktop and 390×844 mobile.
+Live checks found zero Axe violations on Home, Demo, Privacy, and Terms; no
+dead links; correct metadata and 404 behavior; working Back focus; no mobile
+overflow; 44×44 px navigation targets; an actionable file-picker focus ring;
+same-origin-only Demo traffic; empty cookies/local/session/IndexedDB/OPFS; and
+a working offline Demo reload. Home, Demo, Privacy, and Terms HTML matched the
+clean build by SHA-256.
 
-## Live evidence
+## Remaining work
 
-`.factory/evidence/polish-3/live/` contains the cold verifier report,
-mobile/desktop screenshots, route and privacy recheck, Lighthouse report, and
-artifact SHA-256 equality report. The live cold check found zero console errors,
-zero Axe violations, no browser persistence, only same-origin requests, working
-offline demo reload, and no mobile overflow. Lighthouse scored 99 performance,
-100 accessibility, 100 best practices, and 100 SEO (LCP 1.546 s, CLS 0, TBT 0).
-
-## Known gaps / next steps
-
-None. Do not publish the crate from this repository; use the factory-owned
-release process when publishing is intended.
+- Register and fully test the retained no-telemetry and no-analytics promises,
+  or narrow them to the existing registered claims.
+- Apply the exact copy rewrites in F-4-1 through F-4-4, then regenerate
+  `.factory/copy-audit.md`.
+- Re-run the entire review. Do not treat the passing build or existing claim
+  matrix as a PASS while any finding remains.
