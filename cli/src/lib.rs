@@ -310,7 +310,9 @@ pub fn checklist_markdown(root: &Path, items: &[ChecklistItem]) -> String {
         return output;
     }
     output.push_str("- [ ] Confirm editor profile names are installed before importing.\n");
-    output.push_str("- [ ] Import one folder at a time; do not carry settings between rows.\n\n");
+    output.push_str(
+        "- [ ] Import one folder at a time; do not carry an editor profile between rows.\n\n",
+    );
     for item in items {
         output.push_str(&format!(
             "## [ ] {}\n\n- Folder: `{}`\n- Editor: `{}`\n- Editor profile: `{}`\n",

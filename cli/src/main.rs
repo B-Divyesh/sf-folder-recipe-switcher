@@ -129,7 +129,7 @@ fn run(cli: Cli) -> Result<()> {
                 let (editor, profile) = parse_mapping(&mapping)?;
                 if editor_mappings.insert(editor.clone(), profile).is_some() {
                     return Err(RecipeError::Invalid(format!(
-                        "editor '{editor}' was mapped more than once"
+                        "editor '{editor}' was supplied more than once"
                     )));
                 }
             }

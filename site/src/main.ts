@@ -46,9 +46,9 @@ export function validateManifest(value: unknown): Manifest {
   if (manifest.schema_version !== 1) throw new Error(`Schema version ${String(manifest.schema_version)} is not supported. Use version 1.`);
   if (typeof manifest.name !== 'string' || !manifest.name.trim()) throw new Error('The recipe file needs a non-empty “name”.');
   if (typeof manifest.recommended_editor !== 'string' || !manifest.recommended_editor.trim()) throw new Error('The recipe file needs a “recommended_editor”.');
-  if (!manifest.editor_mappings || typeof manifest.editor_mappings !== 'object') throw new Error('The recipe file needs saved “editor_mappings”.');
+  if (!manifest.editor_mappings || typeof manifest.editor_mappings !== 'object') throw new Error('The recipe file needs a saved editor profile in “editor_mappings”.');
   const profile = manifest.editor_mappings[manifest.recommended_editor];
-  if (typeof profile !== 'string' || !profile.trim()) throw new Error(`There is no profile mapped for “${manifest.recommended_editor}”.`);
+  if (typeof profile !== 'string' || !profile.trim()) throw new Error(`There is no saved profile for “${manifest.recommended_editor}”.`);
   return manifest as Manifest;
 }
 
