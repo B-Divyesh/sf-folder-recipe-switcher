@@ -17,7 +17,7 @@ Every finding in `.factory/review-1.md` is resolved. There were no earlier `revi
 | --- | --- | --- |
 | F-1-1 | Replaced the metaphorical hero with “Save photo editor profiles beside folders,” named photographers, and made the sample the primary action with an outcome note and three facts. | Playwright `first screen explains the job…`; [mobile first screen](evidence/live/screenshot-mobile.webp); live `/` 200. |
 | F-1-2 | Added `folder-recipe demo`, bundled `examples/`, unique temporary output, `/demo`, `?demo=1`, persistent banner, Reset, and Start-for-real controls. | `@claim:demo-isolated`, `@claim:web-demo-isolated`; [mobile demo](evidence/live/demo-mobile.webp); live `/demo` 200 with demo title. |
-| F-1-3 | Added `.factory/claims.json`, 14 unique `@claim:` tests, and a runner supporting each ledger command. | Every ledger command ran separately from a clean clone; all 14 passed. |
+| F-1-3 | Added `.factory/claims.json`, 14 unique `@claim:` tests, and a runner supporting each ledger command. | Every ledger command ran separately from clean clone `95969be`; all 14 passed. |
 | F-1-4 | Replaced vague metadata with the concrete write/check/export job and listed its observable behavior. | `@claim:recipe-write`, `@claim:cli-offline`; live root metadata check. |
 | F-1-5 | Reworded as observed file counts/extensions and verified real folder scanning. | `@claim:recipe-write`. |
 | F-1-6 | Retained “Does not change photos” only with full hash coverage. | `@claim:originals-unchanged`. |
@@ -58,7 +58,7 @@ Every finding in `.factory/review-1.md` is resolved. There were no earlier `revi
 
 ## Verification evidence
 
-- Clean clone: `/tmp/folder-recipe-clean.ULTSLy`, commit `71ef63e26e33605bd9067db77b6d66ae59aefc9c`.
+- Clean clone: `/tmp/folder-recipe-final.qt3HAt`, commit `95969bec264831145aa153bb89d3662fa5a75295`.
 - Each of the 13 `.factory/claims.json` commands passed separately from that clone.
 - `cargo fmt --all -- --check`, strict Clippy, `npm test`, `npm run build`, and `cargo package` all passed there.
 - Browser matrix: 12 Playwright checks passed across desktop Chromium and 390×844 mobile; Axe found zero serious/critical issues.
