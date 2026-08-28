@@ -1,0 +1,148 @@
+{
+  "routes": {
+    "/": {
+      "status": 200,
+      "title": "Folder Recipe — Save photo editor profiles"
+    },
+    "/demo/": {
+      "status": 200,
+      "title": "Demo — Folder Recipe"
+    },
+    "/privacy/": {
+      "status": 200,
+      "title": "Privacy — Folder Recipe"
+    },
+    "/terms/": {
+      "status": 200,
+      "title": "Terms — Folder Recipe"
+    },
+    "/not-a-real-page": {
+      "status": 404,
+      "title": "Page not found — Folder Recipe"
+    }
+  },
+  "desktop": {
+    "first": {
+      "title": "Folder Recipe — Save photo editor profiles",
+      "h1": "Save photo editor profiles beside folders",
+      "eyebrow": "01 Photo editor profiles for each folder",
+      "facts": [
+        {
+          "text": "Runs locally without a network connection",
+          "y": 678.015625
+        },
+        {
+          "text": "Does not change photos",
+          "y": 678.015625
+        },
+        {
+          "text": "Free under the MIT License",
+          "y": 706.15625
+        }
+      ],
+      "overflow": false
+    },
+    "demo": {
+      "url": "https://folder-recipe-switcher.sociobot.in/?demo=1",
+      "title": "Demo — Folder Recipe",
+      "h1": "Check saved profiles in a sample shoot",
+      "active": "reset-demo",
+      "banner": "Demo — sample data, nothing is saved Reset demoStart for real",
+      "status": "Saved in this folder",
+      "labels": [
+        "Why",
+        "Camera, source, and file types",
+        "Saved editor profiles"
+      ],
+      "sample": "August portraits",
+      "initialActive": "hero-title"
+    },
+    "back": {
+      "url": "https://folder-recipe-switcher.sociobot.in/?cold=polish2-desktop",
+      "active": "hero-title",
+      "announcement": "Save photo editor profiles beside folders"
+    },
+    "startReal": {
+      "path": "/",
+      "search": "",
+      "bannerHidden": true
+    },
+    "storage": {
+      "local": 0,
+      "session": 0,
+      "cookies": "",
+      "indexedDb": 0,
+      "opfs": 0
+    },
+    "errors": [],
+    "onlySameOrigin": true
+  },
+  "mobile": {
+    "first": {
+      "title": "Folder Recipe — Save photo editor profiles",
+      "h1": "Save photo editor profiles beside folders",
+      "eyebrow": "01 Photo editor profiles for each folder",
+      "facts": [
+        {
+          "text": "Runs locally without a network connection",
+          "y": 585.328125
+        },
+        {
+          "text": "Does not change photos",
+          "y": 613.46875
+        },
+        {
+          "text": "Free under the MIT License",
+          "y": 641.609375
+        }
+      ],
+      "overflow": false
+    },
+    "demo": {
+      "url": "https://folder-recipe-switcher.sociobot.in/?demo=1",
+      "title": "Demo — Folder Recipe",
+      "h1": "Check saved profiles in a sample shoot",
+      "active": "reset-demo",
+      "banner": "Demo — sample data, nothing is saved Reset demoStart for real",
+      "status": "Saved in this folder",
+      "labels": [
+        "Why",
+        "Camera, source, and file types",
+        "Saved editor profiles"
+      ],
+      "sample": "August portraits",
+      "initialActive": "hero-title"
+    },
+    "back": {
+      "url": "https://folder-recipe-switcher.sociobot.in/?cold=polish2-mobile",
+      "active": "hero-title",
+      "announcement": "Save photo editor profiles beside folders"
+    },
+    "startReal": {
+      "path": "/",
+      "search": "",
+      "bannerHidden": true
+    },
+    "storage": {
+      "local": 0,
+      "session": 0,
+      "cookies": "",
+      "indexedDb": 0,
+      "opfs": 0
+    },
+    "errors": [],
+    "onlySameOrigin": true
+  },
+  "offline": {
+    "title": "Demo — Folder Recipe",
+    "main": 1,
+    "sample": "August portraits",
+    "notice": "Offline. The demo and recipe file checker remain available."
+  },
+  "staticRouteBack": {
+    "url": "https://folder-recipe-switcher.sociobot.in/privacy/",
+    "activeTag": "H1",
+    "activeText": "Privacy for your photo folders",
+    "announcement": "Privacy for your photo folders"
+  }
+}

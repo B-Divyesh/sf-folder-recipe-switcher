@@ -1,0 +1,142 @@
+{
+  "routes": {
+    "/": {
+      "status": 200,
+      "title": "Folder Recipe — Save photo editor profiles",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "header": 1,
+      "footer": 1,
+      "description": true,
+      "canonical": "https://folder-recipe-switcher.sociobot.in/",
+      "ogImage": "https://folder-recipe-switcher.sociobot.in/social-card.jpg",
+      "twitter": "summary_large_image",
+      "apple": "https://folder-recipe-switcher.sociobot.in/apple-touch-icon.png",
+      "missingAlt": 0
+    },
+    "/demo/": {
+      "status": 200,
+      "title": "Demo — Folder Recipe",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "header": 1,
+      "footer": 1,
+      "description": true,
+      "canonical": "https://folder-recipe-switcher.sociobot.in/demo/",
+      "ogImage": "https://folder-recipe-switcher.sociobot.in/social-card.jpg",
+      "twitter": "summary_large_image",
+      "apple": "https://folder-recipe-switcher.sociobot.in/apple-touch-icon.png",
+      "missingAlt": 0
+    },
+    "/privacy/": {
+      "status": 200,
+      "title": "Privacy — Folder Recipe",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "header": 1,
+      "footer": 1,
+      "description": true,
+      "canonical": "https://folder-recipe-switcher.sociobot.in/privacy/",
+      "ogImage": "https://folder-recipe-switcher.sociobot.in/social-card.jpg",
+      "twitter": "summary_large_image",
+      "apple": "https://folder-recipe-switcher.sociobot.in/apple-touch-icon.png",
+      "missingAlt": 0
+    },
+    "/terms/": {
+      "status": 200,
+      "title": "Terms — Folder Recipe",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "header": 1,
+      "footer": 1,
+      "description": true,
+      "canonical": "https://folder-recipe-switcher.sociobot.in/terms/",
+      "ogImage": "https://folder-recipe-switcher.sociobot.in/social-card.jpg",
+      "twitter": "summary_large_image",
+      "apple": "https://folder-recipe-switcher.sociobot.in/apple-touch-icon.png",
+      "missingAlt": 0
+    },
+    "/not-a-real-page": {
+      "status": 404,
+      "title": "Page not found — Folder Recipe",
+      "lang": "en",
+      "h1": 1,
+      "main": 1,
+      "header": 1,
+      "footer": 1,
+      "description": true,
+      "canonical": "https://folder-recipe-switcher.sociobot.in/404",
+      "ogImage": "https://folder-recipe-switcher.sociobot.in/social-card.jpg",
+      "twitter": "summary_large_image",
+      "apple": "https://folder-recipe-switcher.sociobot.in/apple-touch-icon.png",
+      "missingAlt": 0
+    }
+  },
+  "linkChecks": [
+    {
+      "url": "https://folder-recipe-switcher.sociobot.in/",
+      "status": 200
+    },
+    {
+      "url": "https://folder-recipe-switcher.sociobot.in/#install",
+      "status": 200
+    },
+    {
+      "url": "https://folder-recipe-switcher.sociobot.in/#main",
+      "status": 200
+    },
+    {
+      "url": "https://folder-recipe-switcher.sociobot.in/#workflow",
+      "status": 200
+    },
+    {
+      "url": "https://folder-recipe-switcher.sociobot.in/?demo=1",
+      "status": 200
+    },
+    {
+      "url": "https://folder-recipe-switcher.sociobot.in/demo/",
+      "status": 200
+    },
+    {
+      "url": "https://folder-recipe-switcher.sociobot.in/demo/#install",
+      "status": 200
+    },
+    {
+      "url": "https://folder-recipe-switcher.sociobot.in/demo/#main",
+      "status": 200
+    },
+    {
+      "url": "https://folder-recipe-switcher.sociobot.in/not-a-real-page#main",
+      "status": 404
+    },
+    {
+      "url": "https://folder-recipe-switcher.sociobot.in/privacy/",
+      "status": 200
+    },
+    {
+      "url": "https://folder-recipe-switcher.sociobot.in/privacy/#main",
+      "status": 200
+    },
+    {
+      "url": "https://folder-recipe-switcher.sociobot.in/terms/",
+      "status": 200
+    },
+    {
+      "url": "https://folder-recipe-switcher.sociobot.in/terms/#main",
+      "status": 200
+    },
+    {
+      "url": "https://github.com/B-Divyesh/sf-folder-recipe-switcher",
+      "status": 200
+    },
+    {
+      "url": "https://github.com/B-Divyesh/sf-folder-recipe-switcher/blob/main/LICENSE",
+      "status": 200,
+      "recheckedWith": "curl Mozilla/5.0 after transient GitHub 429"
+    }
+  ]
+}
