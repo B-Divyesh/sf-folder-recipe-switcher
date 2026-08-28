@@ -1,0 +1,44 @@
+{
+  "origin": "https://folder-recipe-switcher.sociobot.in",
+  "routes": {
+    "/": {
+      "status": 200,
+      "title": "Folder Recipe — Save photo editor profiles",
+      "contentSecurityPolicy": "default-src 'self'; img-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; worker-src 'self'"
+    },
+    "/demo/": {
+      "status": 200,
+      "title": "Demo — Folder Recipe",
+      "contentSecurityPolicy": "default-src 'self'; img-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; worker-src 'self'"
+    },
+    "/privacy/": {
+      "status": 200,
+      "title": "Privacy — Folder Recipe",
+      "contentSecurityPolicy": "default-src 'self'; img-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; worker-src 'self'"
+    },
+    "/terms/": {
+      "status": 200,
+      "title": "Terms — Folder Recipe",
+      "contentSecurityPolicy": "default-src 'self'; img-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; worker-src 'self'"
+    },
+    "/not-a-real-page": {
+      "status": 404,
+      "title": "Page not found — Folder Recipe",
+      "contentSecurityPolicy": "default-src 'self'; img-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; worker-src 'self'"
+    }
+  },
+  "axe": {
+    "/": [],
+    "/demo/": [],
+    "/privacy/": [],
+    "/terms/": []
+  },
+  "storage": {
+    "local": 0,
+    "session": 0,
+    "cookies": "",
+    "databases": 0
+  },
+  "requestCount": 48,
+  "errors": []
+}
