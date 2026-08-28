@@ -30,6 +30,9 @@ const dropZone = document.querySelector<HTMLElement>('#drop-zone')!;
 const output = document.querySelector<HTMLElement>('#recipe-output')!;
 const sampleButton = document.querySelector<HTMLButtonElement>('#load-sample')!;
 const offlineNote = document.querySelector<HTMLElement>('#offline-note')!;
+const demoBanner = document.querySelector<HTMLElement>('#demo-banner')!;
+const resetDemoButton = document.querySelector<HTMLButtonElement>('#reset-demo')!;
+const routeAnnouncer = document.querySelector<HTMLElement>('#route-announcer')!;
 
 function escapeHtml(value: string): string {
   return value.replace(/[&<>'"]/g, (character) => ({
@@ -87,6 +90,11 @@ async function readFile(file?: File): Promise<void> {
 
 fileInput.addEventListener('change', () => void readFile(fileInput.files?.[0]));
 sampleButton.addEventListener('click', () => renderManifest(sample));
+resetDemoButton.addEventListener('click', () => {
+  fileInput.value = '';
+  renderManifest(sample);
+  routeAnnouncer.textContent = 'Demo reset to the bundled portrait sample.';
+});
 for (const eventName of ['dragenter', 'dragover']) {
   dropZone.addEventListener(eventName, (event) => { event.preventDefault(); dropZone.classList.add('is-dragging'); });
 }
@@ -112,6 +120,43 @@ function updateNetworkState(online = navigator.onLine): void {
 window.addEventListener('online', () => updateNetworkState(true));
 window.addEventListener('offline', () => updateNetworkState(false));
 updateNetworkState();
+
+const demoMode = document.body.dataset.forceDemo === 'true'
+  || new URLSearchParams(window.location.search).get('demo') === '1'
+  || window.location.pathname.replace(/\/$/, '') === '/demo';
+if (demoMode) {
+  document.body.classList.add('is-demo');
+  demoBanner.hidden = false;
+  document.querySelectorAll<HTMLElement>('[data-demo-only]').forEach((element) => { element.hidden = false; });
+  renderManifest(sample);
+  document.title = 'Demo — Folder Recipe';
+  const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if (canonical) canonical.href = 'https://folder-recipe-switcher.sociobot.in/demo/';
+  const title = document.querySelector<HTMLElement>('#hero-title')!;
+  title.textContent = 'Check saved profiles in a sample shoot';
+  window.requestAnimationFrame(() => {
+    title.focus();
+    routeAnnouncer.textContent = 'Demo loaded. Sample recipe profiles are ready.';
+  });
+} else {
+  let cameFromThisSite = false;
+  try { cameFromThisSite = new URL(document.referrer).origin === window.location.origin; } catch { /* Direct visit. */ }
+  if (cameFromThisSite) {
+    const title = document.querySelector<HTMLElement>('#hero-title')!;
+    window.requestAnimationFrame(() => {
+      title.focus();
+      routeAnnouncer.textContent = title.textContent ?? 'Home loaded';
+    });
+  }
+}
+
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    const title = document.querySelector<HTMLElement>('#hero-title');
+    title?.focus();
+    routeAnnouncer.textContent = title?.textContent ?? 'Page restored';
+  }
+});
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => void navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }));

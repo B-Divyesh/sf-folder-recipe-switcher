@@ -1,16 +1,29 @@
 import { createHash } from 'node:crypto';
-import { readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const repositoryRoot = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const siteRoot = resolve(repositoryRoot, 'dist/site');
 const index = await readFile(resolve(siteRoot, 'index.html'), 'utf8');
+const demo = index
+  .replace('<body>', '<body data-force-demo="true">')
+  .replace('<title>Folder Recipe — Save photo editor profiles</title>', '<title>Demo — Folder Recipe</title>')
+  .replaceAll('content="Folder Recipe — Save photo editor profiles"', 'content="Demo — Folder Recipe"')
+  .replaceAll('content="Keep each photo folder’s chosen editor profile in a readable recipe file."', 'content="Try Folder Recipe with an isolated sample shoot and saved editor profiles."')
+  .replace('rel="canonical" href="https://folder-recipe-switcher.sociobot.in/"', 'rel="canonical" href="https://folder-recipe-switcher.sociobot.in/demo/"')
+  .replace('property="og:url" content="https://folder-recipe-switcher.sociobot.in/"', 'property="og:url" content="https://folder-recipe-switcher.sociobot.in/demo/"');
+await mkdir(resolve(siteRoot, 'demo'), { recursive: true });
+await writeFile(resolve(siteRoot, 'demo/index.html'), demo);
 const assets = [...index.matchAll(/(?:src|href)="(\/assets\/[^\"]+)"/g)].map((match) => match[1]);
 const shell = [...new Set([
   '/',
+  '/demo/',
+  '/404.html',
   '/folder-mark.svg',
+  '/apple-touch-icon.png',
   '/archive-room.webp',
+  '/social-card.jpg',
   '/legal.css',
   '/privacy/',
   '/terms/',

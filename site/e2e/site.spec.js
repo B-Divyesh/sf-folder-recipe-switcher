@@ -78,7 +78,7 @@ test('sample manifest works with keyboard and has no serious accessibility issue
   });
   await page.goto('/');
   await expect(page.locator('h1')).toHaveCount(1);
-  await page.getByRole('button', { name: 'Or load the portrait sample' }).focus();
+  await page.getByRole('button', { name: 'Try the sample recipe file' }).focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('heading', { name: 'August portraits' })).toBeVisible();
   await expect(page.getByText('Portrait neutral v3').last()).toBeVisible();
@@ -102,15 +102,46 @@ test('invalid manifests produce an actionable error', async ({ page }) => {
 
 test('legal pages and offline shell remain reachable', async ({ page, context }) => {
   await page.goto('/privacy/');
-  await expect(page.getByRole('heading', { name: 'Privacy, kept local.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Privacy for your photo folders' })).toBeVisible();
   await page.goto('/');
   await page.waitForFunction(() => navigator.serviceWorker?.controller !== null);
   await page.evaluate(() => window.dispatchEvent(new Event('offline')));
-  await expect(page.getByText(/Offline\. The docs/)).toBeVisible();
+  await expect(page.getByText(/Offline\. The demo/)).toBeVisible();
   await page.evaluate(() => window.dispatchEvent(new Event('online')));
   await context.setOffline(true);
   await page.reload();
   await expect(page.locator('main')).toBeVisible();
+});
+
+test('first screen explains the job and demo route restores focus', async ({ page }, testInfo) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Save photo editor profiles beside folders' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Try it with sample data' })).toBeVisible();
+  await expect(page.getByText('For photographers mixing shoots and editors')).toBeVisible();
+  if (testInfo.project.name === 'mobile-390') {
+    for (const text of ['Runs on your computer', 'Does not change photos', 'Free under the MIT License']) {
+      const box = await page.getByText(text, { exact: true }).boundingBox();
+      expect(box?.y).toBeLessThan(844);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  }
+  await page.getByRole('link', { name: 'Try it with sample data' }).click();
+  await expect(page).toHaveTitle('Demo — Folder Recipe');
+  await expect(page.locator('h1')).toBeFocused();
+  await expect(page.getByText('Demo — sample data, nothing is saved')).toBeVisible();
+});
+
+test('route metadata, shared shell, and designed 404 are present', async ({ page }) => {
+  for (const [path, title] of [['/demo/', 'Demo — Folder Recipe'], ['/privacy/', 'Privacy — Folder Recipe'], ['/terms/', 'Terms — Folder Recipe']]) {
+    await page.goto(path);
+    await expect(page).toHaveTitle(title);
+    await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
+    await expect(page.locator('meta[property="og:image"]')).toHaveCount(1);
+    await expect(page.getByText('Built by Param Factory')).toBeVisible();
+  }
+  await page.goto('/404.html');
+  await expect(page).toHaveTitle('Page not found — Folder Recipe');
+  await expect(page.getByRole('heading', { name: 'This page has no recipe' })).toBeVisible();
 });
 
 test('a controlled client adopts a future shell and asset graph without clearing site data', async ({ page }) => {

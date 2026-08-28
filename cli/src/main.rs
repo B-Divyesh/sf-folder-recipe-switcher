@@ -7,13 +7,14 @@ use serde::Serialize;
 use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Parser, Debug)]
 #[command(
     name = "folder-recipe",
     version,
-    about = "Keep each photo folder's processing intent explicit",
-    long_about = "Write a portable .photo-recipe.json, preview the direct or inherited recipe, and export a deterministic import checklist. Folder Recipe never modifies photos or editor sidecars."
+    about = "Save photo editor profiles beside folders",
+    long_about = "Write a .photo-recipe.json beside a photo folder, show the direct or nearest inherited recipe, and export an import checklist. Folder Recipe never modifies photos or editor sidecars."
 )]
 struct Cli {
     #[command(subcommand)]
@@ -22,6 +23,12 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Command {
+    /// Run the complete workflow on bundled sample data in a new temporary folder
+    Demo {
+        /// Create the isolated sample at this new path instead of a temporary path
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
     /// Write a versioned recipe manifest beside a photo folder
     Init {
         /// Existing photo folder to describe
@@ -104,6 +111,7 @@ fn main() {
 
 fn run(cli: Cli) -> Result<()> {
     match cli.command {
+        Command::Demo { output } => run_demo(output)?,
         Command::Init {
             folder,
             name,
@@ -274,6 +282,101 @@ fn run(cli: Cli) -> Result<()> {
             }
         }
     }
+    Ok(())
+}
+
+fn run_demo(output: Option<PathBuf>) -> Result<()> {
+    let root = match output {
+        Some(path) => path,
+        None => {
+            let stamp = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .map_err(|error| {
+                    RecipeError::Invalid(format!("cannot create demo timestamp: {error}"))
+                })?
+                .as_millis();
+            std::env::temp_dir().join(format!("folder-recipe-demo-{}-{stamp}", std::process::id()))
+        }
+    };
+    if root.exists() {
+        return Err(RecipeError::Invalid(format!(
+            "demo path already exists: {}; choose a new --output path",
+            root.display()
+        )));
+    }
+
+    let portraits = root.join("2026-08-portraits");
+    let selects = portraits.join("selects");
+    let scans = root.join("family-negatives");
+    fs::create_dir_all(&selects)?;
+    fs::create_dir_all(&scans)?;
+    fs::write(
+        portraits.join("DSCF1842.RAF"),
+        b"Folder Recipe sample placeholder for a Fujifilm RAW original.\n",
+    )?;
+    fs::write(
+        selects.join("DSCF1842.jpg"),
+        b"Folder Recipe sample placeholder for a portrait select.\n",
+    )?;
+    fs::write(
+        scans.join("roll-07-frame-12.tiff"),
+        b"Folder Recipe sample placeholder for a scanned family negative.\n",
+    )?;
+
+    let portrait_recipe = Manifest {
+        schema_version: SCHEMA_VERSION,
+        name: "August window-light portraits".into(),
+        recommended_editor: "rawtherapee".into(),
+        editor_mappings: BTreeMap::from([
+            ("darktable".into(), "Portrait neutral".into()),
+            ("rawtherapee".into(), "Portrait neutral v3".into()),
+        ]),
+        heuristics: Heuristics {
+            camera_models: vec!["Fujifilm X-T5".into()],
+            sources: vec!["camera-raw".into()],
+            extensions: vec!["raf".into(), "jpg".into()],
+        },
+        note: Some("Mixed window light; protect warm skin tones".into()),
+        created_with: format!("folder-recipe {}", env!("CARGO_PKG_VERSION")),
+    };
+    let scan_recipe = Manifest {
+        schema_version: SCHEMA_VERSION,
+        name: "Family negative scans".into(),
+        recommended_editor: "darktable".into(),
+        editor_mappings: BTreeMap::from([("darktable".into(), "Linear scan base".into())]),
+        heuristics: Heuristics {
+            camera_models: vec![],
+            sources: vec!["film-scan".into()],
+            extensions: vec!["tiff".into()],
+        },
+        note: Some("Keep the scanner profile neutral before grading".into()),
+        created_with: format!("folder-recipe {}", env!("CARGO_PKG_VERSION")),
+    };
+    write_manifest(&portraits, &portrait_recipe, false)?;
+    write_manifest(&scans, &scan_recipe, false)?;
+    let inspection = inspect_folder(&selects)?;
+    let checklist_path = root.join("import-checklist.md");
+    let items = discover_checklist(&root)?;
+    fs::write(&checklist_path, checklist_markdown(&root, &items))?;
+
+    println!("Demo — bundled sample data in a new temporary folder");
+    println!("Nothing here reads or writes your real photo folders.");
+    println!("\n$ folder-recipe inspect {}/selects", portraits.display());
+    println!("Recipe: {}", inspection.recipe.name);
+    println!("Source: {} (inherited)", inspection.manifest_path.display());
+    println!(
+        "Apply: {} → {}",
+        inspection.recipe.recommended_editor,
+        inspection.recipe.editor_mappings[&inspection.recipe.recommended_editor]
+    );
+    println!(
+        "\n$ folder-recipe checklist {} --output {}",
+        root.display(),
+        checklist_path.display()
+    );
+    println!("Wrote {} folder recipe(s)", items.len());
+    println!("\nDemo folder: {}", root.display());
+    println!("Delete that folder to reset the CLI demo.");
     Ok(())
 }
 

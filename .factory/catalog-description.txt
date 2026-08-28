@@ -1,0 +1,1 @@
+Save photo editor profiles beside folders and export import checklists with a local CLI.

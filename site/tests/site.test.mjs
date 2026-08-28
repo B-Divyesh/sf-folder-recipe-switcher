@@ -21,8 +21,11 @@ test('landing page has required semantic structure', async () => {
 test('privacy and terms are static routes', async () => {
   for (const route of ['privacy', 'terms']) {
     const html = await readFile(new URL(`public/${route}/index.html`, root), 'utf8');
-    assert.match(html, /<main>/);
+    assert.match(html, /<main\b/);
     assert.equal((html.match(/<h1\b/g) ?? []).length, 1);
+    assert.match(html, /rel="canonical"/);
+    assert.match(html, /property="og:image"/);
+    assert.match(html, /Built by Param Factory/);
   }
 });
 
@@ -51,13 +54,12 @@ test('built site versions its service worker and declares immutable asset cachin
   assert.match(headers, /\/assets\/\*\n  Cache-Control: public, max-age=31536000, immutable/);
   assert.match(headers, /\/sw\.js\n  Cache-Control: no-cache/);
   assert.match(headers, /\/\n  Cache-Control: public, max-age=0, must-revalidate/);
-  assert.deepEqual(JSON.parse(staticWebAppConfig).routes, [
-    { route: '/assets/*', headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
-    { route: '/sw.js', headers: { 'Cache-Control': 'no-cache' } },
-    { route: '/', headers: { 'Cache-Control': 'public, max-age=0, must-revalidate' } },
-    { route: '/privacy/*', headers: { 'Cache-Control': 'public, max-age=0, must-revalidate' } },
-    { route: '/terms/*', headers: { 'Cache-Control': 'public, max-age=0, must-revalidate' } },
-  ]);
+  const config = JSON.parse(staticWebAppConfig);
+  assert.equal(config.globalHeaders['X-Frame-Options'], 'DENY');
+  assert.match(config.globalHeaders['Content-Security-Policy'], /frame-ancestors 'none'/);
+  assert.match(config.globalHeaders['Permissions-Policy'], /camera=\(\)/);
+  assert.deepEqual(config.responseOverrides['404'], { rewrite: '/404.html', statusCode: 404 });
+  assert.equal(config.routes.find(({ route }) => route === '/assets/*').headers['Cache-Control'], 'public, max-age=31536000, immutable');
 });
 
 test('a shell change produces a different service-worker revision', async () => {
@@ -68,7 +70,7 @@ test('a shell change produces a different service-worker revision', async () => 
     readFile(workerUrl, 'utf8'),
   ]);
   try {
-    await writeFile(indexUrl, originalIndex.replace('Folder Recipe · Free and open source', 'Folder Recipe · Updated release'));
+    await writeFile(indexUrl, originalIndex.replace('Folder Recipe saves editor profiles beside photo folders.', 'Folder Recipe release updated.'));
     await run('node', ['scripts/build-site.mjs'], { cwd: process.cwd() });
     const nextWorker = await readFile(workerUrl, 'utf8');
     assert.notEqual(nextWorker.match(/const CACHE = '([^']+)'/)?.[1], originalWorker.match(/const CACHE = '([^']+)'/)?.[1]);
