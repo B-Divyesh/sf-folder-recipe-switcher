@@ -75,16 +75,17 @@ test('@claim:demo-isolated creates a disposable complete sample', async () => {
 test('@claim:recipe-write writes readable versioned mappings and folder signals', async () => {
   const base = await temp();
   try {
-    await writeFile(join(base, 'frame.RAF'), 'raw fixture');
-    await init(base, 'August portraits');
-    const path = join(base, '.photo-recipe.json');
+    await run(['demo', '--output', join(base, 'demo')]);
+    const shoot = join(base, 'write-check'); await mkdir(shoot); await writeFile(join(shoot, 'frame.RAF'), 'raw fixture');
+    await init(shoot, 'August portraits');
+    const path = join(shoot, '.photo-recipe.json');
     const first = await readFile(path, 'utf8');
     const recipe = JSON.parse(first);
     assert.equal(recipe.schema_version, 1);
     assert.deepEqual(recipe.editor_mappings, { darktable: 'Portrait neutral', rawtherapee: 'Portrait neutral v3' });
     assert.deepEqual(recipe.heuristics.extensions, ['raf']);
     assert.equal(recipe.note, 'Protect warm skin tones');
-    await run(['init', base, '--name', 'August portraits', '--map', 'darktable=Portrait neutral', '--map', 'rawtherapee=Portrait neutral v3', '--recommend', 'rawtherapee', '--note', 'Protect warm skin tones', '--force']);
+    await run(['init', shoot, '--name', 'August portraits', '--map', 'darktable=Portrait neutral', '--map', 'rawtherapee=Portrait neutral v3', '--recommend', 'rawtherapee', '--note', 'Protect warm skin tones', '--force']);
     assert.equal(await readFile(path, 'utf8'), first);
   } finally { await rm(base, { recursive: true, force: true }); }
 });
@@ -92,40 +93,41 @@ test('@claim:recipe-write writes readable versioned mappings and folder signals'
 test('@claim:originals-unchanged preserves photos and sidecars through every operation', async () => {
   const base = await temp();
   try {
-    const shoot = join(base, 'shoot'); await mkdir(shoot);
-    const originals = [join(shoot, 'frame.RAF'), join(shoot, 'frame.xmp'), join(shoot, 'preview.jpg')];
-    await Promise.all(originals.map((path, index) => writeFile(path, `fixture-${index}`)));
+    const demo = join(base, 'demo'); await run(['demo', '--output', demo]);
+    const shoot = join(demo, '2026-08-portraits');
+    const sidecar = join(shoot, 'DSCF1842.xmp'); await writeFile(sidecar, 'sidecar fixture');
+    const originals = [join(shoot, 'DSCF1842.RAF'), join(shoot, 'selects', 'DSCF1842.jpg'), sidecar, join(demo, 'family-negatives', 'roll-07-frame-12.tiff')];
     const before = await Promise.all(originals.map(digest));
-    await init(shoot, 'Untouched originals');
-    await run(['inspect', shoot, '--json']);
-    await run(['checklist', base, '--output', join(base, 'checklist.md')]);
+    await run(['init', shoot, '--name', 'Untouched originals', '--map', 'rawtherapee=Portrait neutral v3', '--force']);
+    await run(['inspect', join(shoot, 'selects'), '--json']);
+    await run(['checklist', demo, '--output', join(base, 'checklist.md')]);
     assert.deepEqual(await Promise.all(originals.map(digest)), before);
-    assert.deepEqual((await readdir(shoot)).sort(), ['.photo-recipe.json', 'frame.RAF', 'frame.xmp', 'preview.jpg']);
+    assert.deepEqual((await readdir(shoot)).sort(), ['.photo-recipe.json', 'DSCF1842.RAF', 'DSCF1842.xmp', 'selects']);
   } finally { await rm(base, { recursive: true, force: true }); }
 });
 
 test('@claim:nearest-inheritance reports direct and nearest parent recipe sources', async () => {
   const base = await temp();
   try {
-    const year = join(base, '2026'); const shoot = join(year, 'shoot'); const selects = join(shoot, 'selects'); await mkdir(selects, { recursive: true });
-    await init(base, 'Archive default', 'Archive profile');
-    let report = JSON.parse((await run(['inspect', selects, '--json'])).stdout);
-    assert.equal(report.recipe.name, 'Archive default'); assert.equal(report.inherited_levels, 3);
-    await init(shoot, 'Shoot override', 'Shoot profile');
-    report = JSON.parse((await run(['inspect', selects, '--json'])).stdout);
-    assert.equal(report.recipe.name, 'Shoot override'); assert.equal(report.inherited_levels, 1); assert.equal(report.manifest_path, join(shoot, '.photo-recipe.json'));
-    const direct = JSON.parse((await run(['inspect', shoot, '--json'])).stdout); assert.equal(direct.inherited, false);
+    const demo = join(base, 'demo'); await run(['demo', '--output', demo]);
+    const shoot = join(demo, '2026-08-portraits'); const selects = join(shoot, 'selects'); const deep = join(selects, 'final'); await mkdir(deep);
+    let report = JSON.parse((await run(['inspect', deep, '--json'])).stdout);
+    assert.equal(report.recipe.name, 'August window-light portraits'); assert.equal(report.inherited_levels, 2);
+    await init(selects, 'Selects override', 'Selects profile');
+    report = JSON.parse((await run(['inspect', deep, '--json'])).stdout);
+    assert.equal(report.recipe.name, 'Selects override'); assert.equal(report.inherited_levels, 1); assert.equal(report.manifest_path, join(selects, '.photo-recipe.json'));
+    const direct = JSON.parse((await run(['inspect', selects, '--json'])).stdout); assert.equal(direct.inherited, false);
   } finally { await rm(base, { recursive: true, force: true }); }
 });
 
 test('@claim:checklist-export exports one deterministic row per recipe folder', async () => {
   const base = await temp();
   try {
-    for (const name of ['b-scans', 'a-portraits']) { const folder = join(base, name); await mkdir(folder); await init(folder, name); }
-    const first = JSON.parse((await run(['checklist', base, '--format', 'json'])).stdout);
-    const second = JSON.parse((await run(['checklist', base, '--format', 'json'])).stdout);
+    const demo = join(base, 'demo'); await run(['demo', '--output', demo]);
+    const first = JSON.parse((await run(['checklist', demo, '--format', 'json'])).stdout);
+    const second = JSON.parse((await run(['checklist', demo, '--format', 'json'])).stdout);
     assert.equal(first.folders.length, 2); assert.deepEqual(first, second);
-    assert.deepEqual(first.folders.map(({ folder }) => folder), ['a-portraits', 'b-scans']);
+    assert.deepEqual(first.folders.map(({ folder }) => folder), ['2026-08-portraits', 'family-negatives']);
   } finally { await rm(base, { recursive: true, force: true }); }
 });
 
@@ -142,6 +144,7 @@ test('@claim:cli-contract is non-interactive and returns documented exit codes',
 test('@claim:future-fields accepts unknown fields and rejects unknown schema versions', async () => {
   const base = await temp();
   try {
+    await run(['demo', '--output', join(base, 'demo')]);
     const recipe = { schema_version: 1, name: 'Future sample', recommended_editor: 'darktable', editor_mappings: { darktable: 'Neutral' }, created_with: 'fixture', future_adapter: { value: 2 } };
     await writeFile(join(base, '.photo-recipe.json'), JSON.stringify(recipe));
     assert.equal((await run(['inspect', base, '--json'])).stdout.includes('Future sample'), true);
@@ -164,12 +167,16 @@ test('@claim:cli-offline completes with network syscalls denied', async () => {
 });
 
 test('@claim:build-outputs produces the release binary and deployable site', async () => {
+  const base = await temp();
+  try { await run(['demo', '--output', join(base, 'demo')]); } finally { await rm(base, { recursive: true, force: true }); }
   assert.equal((await stat(binary)).isFile(), true);
   assert.deepEqual(await readdir(resolve(root, 'dist/bin')), [`folder-recipe${process.platform === 'win32' ? '.exe' : ''}`]);
   for (const file of ['index.html', 'demo/index.html', 'privacy/index.html', 'terms/index.html', '404.html', 'sw.js']) assert.equal((await stat(join(siteRoot, file))).isFile(), true);
 });
 
 test('@claim:scope-boundary exposes recording tools but no photo-editing or catalogue command', async () => {
+  const base = await temp();
+  try { await run(['demo', '--output', join(base, 'demo')]); } finally { await rm(base, { recursive: true, force: true }); }
   const help = (await run(['--help'])).stdout;
   for (const command of ['demo', 'init', 'inspect', 'checklist']) assert.match(help, new RegExp(`\\b${command}\\b`));
   assert.doesNotMatch(help, /\b(edit|apply|catalogue|catalog)\b/i);
@@ -223,6 +230,8 @@ test('@claim:offline-demo reloads and resets the sample without a connection', a
 });
 
 test('@claim:mit-free has an MIT license and no account or payment path', async () => {
+  const base = await temp();
+  try { await run(['demo', '--output', join(base, 'demo')]); } finally { await rm(base, { recursive: true, force: true }); }
   assert.match(await readFile(resolve(root, 'LICENSE'), 'utf8'), /MIT License/);
   const terms = await readFile(resolve(siteRoot, 'terms/index.html'), 'utf8');
   assert.match(terms, /no accounts, subscriptions, purchases, or cloud storage/i);
