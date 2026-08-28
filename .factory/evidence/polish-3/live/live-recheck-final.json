@@ -1,0 +1,104 @@
+{
+  "home": {
+    "facts": [
+      {
+        "text": "Runs locally without a network connection",
+        "bottom": 585
+      },
+      {
+        "text": "Does not change photos",
+        "bottom": 613
+      },
+      {
+        "text": "Free under the MIT License",
+        "bottom": 642
+      }
+    ],
+    "overflow": false
+  },
+  "demo": {
+    "url": "https://folder-recipe-switcher.sociobot.in/demo/",
+    "title": "Demo — Folder Recipe",
+    "focused": true,
+    "banner": true,
+    "values": {
+      "August portraits": 314,
+      "RawTherapee": 356,
+      "Portrait neutral v3": 392,
+      "Protect warm skin tones": 429,
+      "Sample ready · 2 folders · 2 profiles": 483
+    },
+    "overflow": false
+  },
+  "query": {
+    "title": "Demo — Folder Recipe",
+    "banner": true,
+    "sample": "August portraits"
+  },
+  "focus": {
+    "active": "manifest-file",
+    "outline": "rgb(255, 180, 84) solid 3px"
+  },
+  "storage": {
+    "local": 0,
+    "session": 0,
+    "cookies": "",
+    "indexedDb": 0,
+    "opfs": 0
+  },
+  "offline": {
+    "heading": "Check saved profiles in a sample shoot",
+    "demoBanner": true
+  },
+  "routes": {
+    "/": {
+      "status": 200,
+      "title": "Folder Recipe — Save photo editor profiles",
+      "description": "Save editor profiles beside photo folders, check inherited recipe files, and export an import checklist.",
+      "canonical": "https://folder-recipe-switcher.sociobot.in/",
+      "ogTitle": "Folder Recipe — Save photo editor profiles",
+      "ogDescription": "Keep each photo folder’s chosen editor profile in a readable recipe file.",
+      "ogUrl": "https://folder-recipe-switcher.sociobot.in/"
+    },
+    "/demo/": {
+      "status": 200,
+      "title": "Demo — Folder Recipe",
+      "description": "Try Folder Recipe with an isolated sample shoot and saved editor profiles.",
+      "canonical": "https://folder-recipe-switcher.sociobot.in/demo/",
+      "ogTitle": "Demo — Folder Recipe",
+      "ogDescription": "Try Folder Recipe with an isolated sample shoot and saved editor profiles.",
+      "ogUrl": "https://folder-recipe-switcher.sociobot.in/demo/"
+    },
+    "/privacy/": {
+      "status": 200,
+      "title": "Privacy — Folder Recipe",
+      "description": "How Folder Recipe handles photo folders, recipe files, and website data.",
+      "canonical": "https://folder-recipe-switcher.sociobot.in/privacy/",
+      "ogTitle": "Privacy — Folder Recipe",
+      "ogDescription": "How Folder Recipe handles photo folders, recipe files, and website data.",
+      "ogUrl": "https://folder-recipe-switcher.sociobot.in/privacy/"
+    },
+    "/terms/": {
+      "status": 200,
+      "title": "Terms — Folder Recipe",
+      "description": "The license, warranty, and use terms for Folder Recipe.",
+      "canonical": "https://folder-recipe-switcher.sociobot.in/terms/",
+      "ogTitle": "Terms — Folder Recipe",
+      "ogDescription": "The license, warranty, and use terms for Folder Recipe.",
+      "ogUrl": "https://folder-recipe-switcher.sociobot.in/terms/"
+    },
+    "/not-a-real-page": {
+      "status": 404,
+      "title": "Page not found — Folder Recipe",
+      "description": "This Folder Recipe page could not be found.",
+      "canonical": "https://folder-recipe-switcher.sociobot.in/404",
+      "ogTitle": "Page not found — Folder Recipe",
+      "ogDescription": "This Folder Recipe page could not be found.",
+      "ogUrl": "https://folder-recipe-switcher.sociobot.in/404"
+    }
+  },
+  "onlySameOrigin": true,
+  "errors": [],
+  "axeDemo": [],
+  "axeHome": []
+}

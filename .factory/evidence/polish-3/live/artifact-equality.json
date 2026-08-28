@@ -1,0 +1,72 @@
+{
+  "/": {
+    "status": 200,
+    "local": "86be0682c67dd9a263e63ccb865fca170f129b733ed1d37d3c1a7497f69e653b",
+    "live": "86be0682c67dd9a263e63ccb865fca170f129b733ed1d37d3c1a7497f69e653b",
+    "equal": true,
+    "cacheControl": "public, max-age=0, must-revalidate"
+  },
+  "/demo/": {
+    "status": 200,
+    "local": "1d7153349a45ec96aa4f8a28710666041d32e42058db4b7ce180882a72f641b7",
+    "live": "1d7153349a45ec96aa4f8a28710666041d32e42058db4b7ce180882a72f641b7",
+    "equal": true,
+    "cacheControl": "public, max-age=0, must-revalidate"
+  },
+  "/privacy/": {
+    "status": 200,
+    "local": "663826007dfa423cbee7bb18e74dd4ed96da3ed0f424722851c294609b7f6474",
+    "live": "663826007dfa423cbee7bb18e74dd4ed96da3ed0f424722851c294609b7f6474",
+    "equal": true,
+    "cacheControl": "public, max-age=0, must-revalidate"
+  },
+  "/terms/": {
+    "status": 200,
+    "local": "d300acfda1b3d27b076f7b00483ce3b0047f76444d88353b7f8a5eb4ad55f0fd",
+    "live": "d300acfda1b3d27b076f7b00483ce3b0047f76444d88353b7f8a5eb4ad55f0fd",
+    "equal": true,
+    "cacheControl": "public, max-age=0, must-revalidate"
+  },
+  "/404.html": {
+    "status": 200,
+    "local": "06148dcc5e85987132d5179c72eac395956f589fcf559b28c9f2ec423aae2ab0",
+    "live": "06148dcc5e85987132d5179c72eac395956f589fcf559b28c9f2ec423aae2ab0",
+    "equal": true,
+    "cacheControl": "public, must-revalidate, max-age=30"
+  },
+  "/sw.js": {
+    "status": 200,
+    "local": "a2efae3886ab9a54b61ce41d39e376b6582fe253fecf375142c5bffee858a812",
+    "live": "a2efae3886ab9a54b61ce41d39e376b6582fe253fecf375142c5bffee858a812",
+    "equal": true,
+    "cacheControl": "no-cache"
+  },
+  "/archive-room.webp": {
+    "status": 200,
+    "local": "50e6e4d1757d34b7202a1411989f8b9b968bf660598707fad7ac4ed501230fd9",
+    "live": "50e6e4d1757d34b7202a1411989f8b9b968bf660598707fad7ac4ed501230fd9",
+    "equal": true,
+    "cacheControl": "public, must-revalidate, max-age=30"
+  },
+  "/social-card.jpg": {
+    "status": 200,
+    "local": "3b0a5892cd27f19e08c57229ba21b072463880d7f5283e0a4845d53977082b4b",
+    "live": "3b0a5892cd27f19e08c57229ba21b072463880d7f5283e0a4845d53977082b4b",
+    "equal": true,
+    "cacheControl": "public, must-revalidate, max-age=30"
+  },
+  "/assets/index-1f63WH_6.js": {
+    "status": 200,
+    "local": "c52806606b2a5a1354d781388e065facae53840a93eea6db891fa03371fd64e0",
+    "live": "c52806606b2a5a1354d781388e065facae53840a93eea6db891fa03371fd64e0",
+    "equal": true,
+    "cacheControl": "public, max-age=31536000, immutable"
+  },
+  "/assets/index-nyBXdbcq.css": {
+    "status": 200,
+    "local": "3b83e8a41da3f0d6d89399fdda77ce5256b4fa0690ded966011ed9fd0f6b0ceb",
+    "live": "3b83e8a41da3f0d6d89399fdda77ce5256b4fa0690ded966011ed9fd0f6b0ceb",
+    "equal": true,
+    "cacheControl": "public, max-age=31536000, immutable"
+  }
+}

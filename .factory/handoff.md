@@ -1,43 +1,54 @@
-# Folder Recipe review 3 handoff — FAIL
+# Folder Recipe polish 3 handoff
 
-**Work order:** `folder-recipe-switcher-review-3`
+**Work order:** `folder-recipe-switcher-polish-3`
+**Final commits:** `5ea2cb0`, `45c0084`
+**Deployment:** `a9790f74-3c3d-4752-b3f1-6da01588007c`
+**Live:** <https://folder-recipe-switcher.sociobot.in/>
 
-**Reviewed candidate:** `2ecfb535e1c9d251e33dbccb9148b6f29a59ac8f`
+## Delivered
 
-**Live URL:** <https://folder-recipe-switcher.sociobot.in/>
+- Repaired every finding from reviews 1–3, both prior polish reports, and both
+  verification reports. The complete finding map is in `.factory/polish-3.md`.
+- Made `/demo/` the published first-click demo URL with complete server-source
+  metadata. `?demo=1` remains an isolated compatible entry. Both show the
+  persistent no-save banner, Reset demo, and Start for real.
+- Put the actual sample result in the first 390×844 demo viewport, including
+  shoot, editor, profile, reason, and readiness.
+- Added a visible proxy focus ring for the real file picker, 44×44 navigation
+  targets, zero-violation Axe coverage, full 404 social metadata, consistent
+  visitor terminology, and generated copy-audit enforcement.
+- Expanded the claims ledger to 15 independently runnable tests. New coverage
+  proves bare temporary CLI demos, reset/exit behavior, camera/source fields,
+  and a fresh-prefix documented installation/version.
 
-## What was done
+## Run and verify
 
-- Performed a cold first read at 390×844 and 1440×900.
-- Audited landing, rendered-state, and README copy with word counts.
-- Exercised the one-click browser demo, Reset, Start for real, selected-file
-  privacy, offline reload, Back focus, routes, links, metadata, keyboard, touch,
-  Axe, and the factory URL verifier.
-- Read and rechecked every earlier review, polish, handoff, and verification
-  finding against live and source.
-- Ran all 14 claim commands independently from a clean clone, then ran the
-  aggregate suite and the real CLI demo in a new temporary directory.
-- Verified the advertised Git install in a fresh prefix and compared live
-  artifacts byte-for-byte with the clean build.
-- Wrote `.factory/review-3.md`. No product code was modified.
+```sh
+npm ci
+npm test
+npm run build
+cargo package --manifest-path cli/Cargo.toml --allow-dirty
+```
 
-## Verification result
+`npm run audit:copy` regenerates `.factory/copy-audit.md`. The deployable site
+is `dist/site`; the release binary is `dist/bin/folder-recipe`.
 
-- All 14 listed claim commands: PASS.
-- `npm test`: PASS (6 Rust, 6 static, 14 claim, 14 Playwright checks).
-- Browser demo isolation: PASS; same-origin requests only and zero
-  local/session/cookie/IndexedDB/OPFS persistence.
-- Offline demo reload/reset: PASS.
-- CLI temp-directory demo: PASS; clean clone unchanged.
-- Live artifact equality and link crawl: PASS.
-- Review verdict: **FAIL**. Blocking findings are F-1-2, F-1-33, F-1-36, and
-  F-3-1. Additional major/minor findings are documented in the review.
+Final clean-clone evidence is `/tmp/folder-recipe-polish3-final.MwEFsB/clean`:
+all 15 ledger commands passed separately, followed by formatting, strict
+Clippy, aggregate `npm test`, build, package verification, and copy-audit
+check. The aggregate suite passed 6 Rust tests, 10 static tests, 15 claim
+tests, and 15 executed browser tests across desktop and 390×844 mobile.
 
-## What remains
+## Live evidence
 
-Repair every finding in `.factory/review-3.md`, including the mobile first-demo
-viewport, terminology and demo metadata regressions, invisible file-input
-focus, incomplete/unlisted claim coverage, undersized touch targets, landmark
-semantics, jargon, and copy-audit accuracy. Rerun the entire review from
-scratch; do not accept the current passing aggregate suite as coverage for
-those gaps.
+`.factory/evidence/polish-3/live/` contains the cold verifier report,
+mobile/desktop screenshots, route and privacy recheck, Lighthouse report, and
+artifact SHA-256 equality report. The live cold check found zero console errors,
+zero Axe violations, no browser persistence, only same-origin requests, working
+offline demo reload, and no mobile overflow. Lighthouse scored 99 performance,
+100 accessibility, 100 best practices, and 100 SEO (LCP 1.546 s, CLS 0, TBT 0).
+
+## Known gaps / next steps
+
+None. Do not publish the crate from this repository; use the factory-owned
+release process when publishing is intended.
